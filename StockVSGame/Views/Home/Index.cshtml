@@ -1,0 +1,130 @@
+﻿@model HomeIndexModel
+<!DOCTYPE html>
+<html lang="zh-Hant-TW">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title></title>
+    <!-- CSS -->
+    <link rel="shortcut icon" href="#" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/8.3/styles/github.min.css">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/fontawesome.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.2/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,400i,600,700|Raleway:300,400,400i,500,500i,700,800,900" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/css/bootstrap-switch-button.min.css">
+
+    <!-- K線圖CSS -->
+    <link rel="stylesheet" href="~/Content/css/style.css">
+
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/gh/gitbrent/bootstrap-switch-button@1.1.0/dist/bootstrap-switch-button.min.js"></script>
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="~/Scripts/techanjs.js"></script>
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/Home/HomeIndex.js"></script>
+    <script>
+        var percent = '@Model.Percent';
+    </script>
+
+    <style TYPE="text/css">
+        body {
+            font-size: 2vW;
+            background: url(Content/img/black-carbon.jpg) repeat;
+            .bg-carbon
+
+        {
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="table-responsive">
+        <table id="" border="0" cellpadding="0" cellspacing="0" class="table table-borderless table-striped">
+            <tr>
+                <td background="~/Content/img/bg_01.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+            </tr>
+            <tr class="" align="center">
+                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                    <div class="pb-0 mb-0">
+                        <div class="row col-10 no-gutters px-0" align="center">
+                            <img src="~/Content/img/banner.svg" style="width:80vW;">
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr class="" align="center">
+                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                    <div class="row col-10 no-gutters" align="left">
+                        <div class="col-4 text-white">
+                            <div><span id="Stock"></span></div>
+                            <div>區間最高:<span id="High">0</span></div>
+                            <div>區間最低:<span id="Low">0</span></div>
+                            <div class="text-danger">買進價:<span id="BPrice"></span></div>
+                        </div>
+                        <div class="col-4 text-white">
+                            <div>起始日: <span id="SDT">2017/10/20</span></div>
+                            <div class="text-warning">20MA: <span id="MAMonth">0</span></div>
+                            <div class="text-info">60MA: <span id="MASeason">0</span></div>
+                            <div class="text-success">賣出價:<span id="SPrice"></span></div>
+                        </div>
+                        <div class="col-4 text-white">
+                            <div>現在: <span id="NowDT">2018/03/22</span></div>
+                            <div>5日RSI值: <span id="RSI">61.67</span></div>
+                            <div>移動鎖利停利: @Model.Percent%</div>
+                            <div>移動鎖利價:<span id="TrigPrice_Robot"></span></div>
+                        </div>
+                    </div>
+                    <div class="col-12">
+                        <div id="CandlestickChart"></div>
+                        @*<img src="~/Content/img/chart1.png" style="width:80vW;height: 320px">*@
+                    </div>
+                </td>
+            </tr>
+            <tr class="" align="center">
+                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                    @*<div class="row col-10 no-gutters" align="left">
+                        <div class="col-4 text-white">成交量</div>
+                    </div>
+                    <div class="col-12">
+                        <img src="~/Content/img/chart2.png" style="width:80vW;height: 120px">
+                    </div>*@
+
+                    <div class="row col-10 no-gutters" align="left">
+                        <div class="col-4 text-white">RSI</div>
+                    </div>
+                    <div class="col-12">
+                        <div id="RSIChart"></div>
+                        @*<img src="~/Content/img/chart3.png" style="width:80vW;height: 120px">*@
+                    </div>
+                </td>
+            </tr>
+
+
+            <tr class="" align="center">
+                <td background="~/Content/img/bg_02.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                    <div class="d-flex col-11 align-items-center" align="center">
+                        <a href="#" class="col">
+                            <img id="StartBtn" src="~/Content/img/bt_play0.svg" class="img-fluid">
+                        </a>
+                        <a href="#" class="col">
+                            <img id="BuyBtn" src="~/Content/img/bt_buy0.svg" class="img-fluid">
+                        </a>
+                        <a href="#" class="col">
+                            <img id="SellBtn" src="~/Content/img/bt_sell0.svg" class="img-fluid">
+                        </a>
+                    </div>
+                </td>
+            </tr>
+
+            <tr>
+                <td background="~/Content/img/bg_04.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="pt-0">&nbsp;&nbsp;<br>&nbsp;&nbsp;</td>
+            </tr>
+        </table>
+    </div>
+</body>
+</html>

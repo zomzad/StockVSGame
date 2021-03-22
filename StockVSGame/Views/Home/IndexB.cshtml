@@ -1,0 +1,126 @@
+﻿@model HomeIndexModel
+@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<html>
+<head>
+    <link rel="shortcut icon" href="#" />
+    <script>
+        var percent = '@Model.Percent';
+    </script>
+    <!-- 資料格式轉換 -->
+    <link rel="stylesheet" href="~/Content/css/style.css">
+    <link rel="stylesheet" href="~/Content/css/bootstrap.css" />
+
+    <!-- 資料格式轉換 -->
+    <script src="https://d3js.org/d3.v4.min.js"></script>
+    <script src="~/Scripts/techanjs.js"></script>
+    <script src="~/Scripts/jquery-3.5.1.min.js"></script>
+    <script type="text/javascript" src="~/Scripts/Home/HomeIndex.js"></script>
+
+    <style>
+        text {
+            fill: #FFF;
+        }
+
+        button {
+            right: 20px;
+            top: 440px;
+            display: none;
+        }
+
+        .rsi path {
+            fill: none;
+            stroke-width: 1;
+        }
+
+        .rsi {
+            stroke: #FFFFFF;
+        }
+
+            .rsi path.overbought, .rsi path.oversold {
+                stroke: #FF9999;
+                stroke-dasharray: 5, 5;
+            }
+
+            .rsi path.middle, path.zero {
+                stroke: #BBBBBB;
+                stroke-dasharray: 5, 5;
+            }
+
+        table {
+            width: 100%;
+            margin: 0 auto;
+            font-family: 'PT Sans', Helvetica, Arial, sans-serif;
+            font-size: 12px;
+            border: none;
+            border-collapse: collapse;
+        }
+
+        td {
+            /* max-width:100%; Mozilla才支援一個max-width 的CSS語法
+            background: #282727;
+            border: none; /*solid #000 1px;*/
+            text-align: left;
+            color: #9b9b9b;
+        }
+
+
+        /* 分享頁面圖片自動縮放裝置螢幕寬度 */
+        img.sharepage {
+            max-width: 100%;
+        }
+    </style>
+</head>
+<body style="background-color: #272727; text-align: center">
+<table style="max-width:1080px;color: aliceblue">
+    <tr>
+        <td colspan="3" style="text-align: left">
+            <img style="max-width:100%;" src="~/Content/img/385x1080.jpg"/>
+        </td>
+
+    </tr>
+    <tr style="background-color: #282727;">
+        <td>個股技術分析圖</td>
+        <td>起始日期: 2020/12/30</td>
+        <td>今日日期: 2021/01/18</td>
+    </tr>
+    <tr>
+        <td>藍色: 5MA</td>
+        <td>紫色: 20MA</td>
+        <td>K線圖</td>
+    </tr>
+    <tr>
+        <td>橘色： 60MA</td>
+        <td id="techK">SSS</td>
+        <td>
+            <button>3</button>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div id="CandlestickChart"></div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <div id="RSIChart"></div>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="3">
+            <button style="margin-right: 0px;" id="BuyBtn" class="btn btn-primary mb-2">買進</button>
+            <button style="margin-right: 0px;" id="SellBtn" class="btn btn-primary mb-2">賣出</button>
+            <button style="margin-right: 5px;" id="StopBtn" class="btn btn-primary mb-2">暫停</button>
+            <button style="margin-right: 5px;" id="StartBtn" class="btn btn-primary mb-2">開始</button>
+            <button style="margin-right: 5px;" id="AgainBtn" class="btn btn-primary mb-2">重新</button>
+            <img style="max-width:100%;" src="http://localhost:60310/Content/img/325x1080.png"/>
+        </td>
+    </tr>
+</table>
+</body>
+</html>

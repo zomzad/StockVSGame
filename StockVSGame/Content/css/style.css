@@ -1,0 +1,107 @@
+body {
+        font: 5px sans-serif;
+}
+
+text {
+    font-size: 7px;
+    fill: #9D9D9D;
+}
+
+path.candle {
+    stroke: #000000;
+}
+
+path.candle.body {
+    stroke-width: 0;
+}
+
+/*上漲K棒*/
+path.candle.up {
+    fill: #FF0000;
+    stroke: #FF0000;
+}
+/*下跌K棒*/
+path.candle.down {
+    fill: #00AA00;
+    stroke: #00AA00;
+}
+
+.volumeBar {
+    opacity: 0.8;
+    fill: #00AA00;
+}
+
+path.volume.up {
+    fill: #FF0000;
+}
+
+path.volume.down {
+    fill: #00AA00;
+}
+
+path.volume.equal {
+    fill: #FF0000;
+}
+
+.ma-0 path.line {
+    stroke: #1f77b4;
+    fill: none;
+    stroke-width: 0.5px;
+}
+.ma-1 path.line {
+    stroke: #ff7f0e;
+    fill: none;
+    stroke-width: 0.5px;
+}
+.ma-2 path.line {
+    stroke: #aec7e8;
+    fill: none;
+    stroke-width: 0.5px;
+}
+
+.x.axis line {
+    fill: none;
+    stroke: rgba(0,0,0,0.1);
+}
+
+.y.axis line {
+    fill: none;
+    stroke: rgba(0,0,0,0.1);
+}
+
+.crosshair {
+    cursor: crosshair;
+}
+
+.crosshair path.wire {
+    stroke: #797979;
+    stroke-dasharray: 1, 1;
+}
+/*十字線提示訊息底色*/
+.crosshair .axisannotation path {
+    fill: #3C3C3C;
+}
+
+rect.pane {
+    cursor: move;
+    fill: none;
+    pointer-events: all;
+}
+.rsi path {
+    fill: none;
+    stroke-width: 0.5px;
+}
+
+.rsi {
+    stroke: #b79224;
+}
+
+.rsi path.overbought, .rsi path.oversold {
+    stroke: #FF9999;
+    stroke-dasharray: 5, 5;
+}
+
+.rsi path.middle, path.zero {
+    stroke: #BBBBBB;
+    stroke-dasharray: 5, 5;
+}

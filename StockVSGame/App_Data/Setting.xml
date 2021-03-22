@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Settings>
+  <MkTContent>你好
+                
+                </MkTContent>
+  <OnOff>O</OnOff>
+  <!--開:O 關:F-->
+  <ActivityUrl>https://www.google.com/</ActivityUrl>
+  <StockNum>1</StockNum>
+  <IsRadom>N</IsRadom>
+  <!--隨機:Y 順序:N-->
+  <Percent>20</Percent>
+</Settings>

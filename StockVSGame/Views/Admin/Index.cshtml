@@ -1,0 +1,96 @@
+﻿@model AdminIndexModel
+@{
+    Layout = null;
+    int rowCount = 0;
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+    
+    <!-- JS -->
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" crossorigin="anonymous"></script>
+
+    <script>
+    $(document).ready(function () {
+        $('input[name$="IsChoose"]').click(function () {
+            if ($(this).prop('checked')) {
+                $(this).val('Y');
+            } else {
+                $(this).val('N');
+            }
+        });
+    });
+    </script>
+</head>
+<body>
+    @using (Html.BeginForm("Index", "Admin"))
+    {
+        <table style="border: 1px">
+            <tr>
+                <th>遮罩開關</th>
+                <td>
+                    <input type="radio" name="OnOff" value="O" @(Model.OnOff == "O" ? "checked" : string.Empty)>
+                    <label for="O">開</label>
+                    <input type="radio" name="OnOff" value="F" @(Model.OnOff == "F" ? "checked" : string.Empty)>
+                    <label for="F">關</label>
+                </td>
+            </tr>
+            <tr>
+                <th>活動網址</th>
+                <td>
+                    <input type="text" id="ActivityUrl" name="ActivityUrl" value="@Model.ActivityUrl" size="100">
+                </td>
+            </tr>
+            <tr>
+                <th>行銷文字</th>
+                <td>
+                    <textarea name="MkTContent" cols="102" rows="5">@(string.IsNullOrWhiteSpace(Model.MkTContent) ? "輸入你想要寫的內容..." : Model.MkTContent)
+                </textarea>
+                </td>
+            </tr>
+            <tr id="StockInfo">
+                <th>抓取股票檔數</th>
+                <td>
+                    <input type="number" min="1" max="99" name="StockNum" value="@Model.StockNum">
+                </td>
+            </tr>
+            @foreach (var row in Model.StockInfoList)
+            {
+                string rowChoose = "StockInfoList[" + rowCount + "].IsChoose";
+                string rowNMStockID = "StockInfoList[" + rowCount + "].StockID";
+                string rowNMDate = "StockInfoList[" + rowCount + "].Date";
+                <tr>
+                    <th>
+                        <input type="checkbox" name="@rowChoose" value="@Model.StockInfoList[rowCount].IsChoose" @(Model.StockInfoList[rowCount].IsChoose == "Y" ? "checked" : string.Empty)>
+                    </th>
+                    <td>
+                        股票代號:<input type="text" max="8" name="@rowNMStockID" value="@Model.StockInfoList[rowCount].StockID">起始日期:<input type="date" name="@rowNMDate" value="@Model.StockInfoList[rowCount].Date">
+                    </td>
+                </tr>
+
+                rowCount++;
+            }
+            <tr>
+                <th>移動鎖利%數</th>
+                <td>
+                    <input type="text" name="Percent" value="@Model.Percent"> %
+                </td>
+            </tr>
+            <tr>
+                <th>顯示方式</th>
+                <td>
+                    <input type="radio" name="IsRadom" value="Y" @(Model.IsRadom == "Y" ? "checked" : string.Empty)>
+                    <label for="Y">隨機</label>
+                    <input type="radio" name="IsRadom" value="N" @(Model.IsRadom == "N" ? "checked" : string.Empty)>
+                    <label for="N">依序</label>
+                </td>
+            </tr>
+        </table>
+        <input type="submit" name="SetBtn" value="設定" />
+    }
+</body>
+</html>
