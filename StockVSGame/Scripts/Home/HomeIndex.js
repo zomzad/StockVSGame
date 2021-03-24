@@ -1,5 +1,5 @@
 ﻿var serverPath = window.location.host.indexOf('localhost') >=0 ? '' : '/StockVSRobot';
-var svg, svgRSI;
+var svg, svgVolume, svgRSI;
 //買賣點X座標
 var bsLineXCoordinate = 0;  
 //K線完整資料
@@ -36,6 +36,10 @@ var rescaledX, rescaledY;
 var margin = { top: 20, right: 50, bottom: 15, left: 60 },
     width = 580 - margin.left - margin.right,
     height = 320 - margin.top - margin.bottom;
+//成交量主體的長寬(非外框)
+var marginVolume = { top: 20, right: 48, bottom: 25, left: 50 },
+    widthVolume = 550 - marginVolume.left - marginVolume.right,
+    heightVolume = 120 - marginVolume.top - marginVolume.bottom;
 //RSI主體的長寬(非外框)
 var marginRSI = { top: 20, right: 48, bottom: 25, left: 50 },
     widthRSI = 550 - marginRSI.left - marginRSI.right,
@@ -82,10 +86,10 @@ var zoom = d3.zoom()
 var zoomableInit, yInit;
 var xAxis = d3.axisBottom()
     .scale(x);
-
 var yAxis = d3.axisLeft()
     .scale(y);
-
+var yAxisR = d3.axisRight()
+    .scale(y);
 var volumeAxis = d3.axisLeft(yVolume)
     .ticks(4)
     .tickFormat(d3.format(",.3s"));
@@ -153,6 +157,13 @@ $(document).ready(function () {
         .attr("pointer-events", "all")
         .append("g")
         .attr("transform", "translate(" + marginRSI.left + "," + marginRSI.top + ")");
+
+    svgVolume = d3.select('div#VolumeChart').append("svg")
+        .attr("preserveAspectRatio", "xMidYMid")
+        .attr("viewBox", "0 0 550 120")
+        .attr("pointer-events", "all")
+        .append("g")
+        .attr("transform", "translate(" + marginVolume.left + "," + marginVolume.top + ")");
 
     loadJSON(window.location.protocol + '//' + window.location.host + serverPath + "/Scripts/data.json", "date");
 });
@@ -402,6 +413,15 @@ function loadJSON(file, type) {
             .attr("font-size", '8px')
             .style("text-anchor", "end");
             //.text("價格 (TWD)");
+
+            svg.append("g").attr("id", "YaxisR")
+                .attr("class", "y axis")
+                .append("text")
+                .attr("y", -5)
+                .attr("x", 5)
+                .attr("font-size", '8px')
+                .style("text-anchor", "end");
+            //.text("價格 (TWD)");
         
         chartData = data;
         rsiChartData = dataRSI;
@@ -433,9 +453,8 @@ function draw(data, RSIData, volumeData) {
         .attr("x", 0)
         .attr("y", 0);
 
-    // 座標區間
+    //座標區間設定
     x.domain(data.slice(59, data.length - 1).map(candlestick.accessor().d));
-    //y.domain(techan.scale.plot.ohlc(data.slice(59, 158), candlestick.accessor()).domain());
     xScale.domain(volumeData.slice(59, volumeData.length - 1).map(function (d) { return d.date; }));
     yVolume.domain(techan.scale.plot.volume(data.slice(59, 158)).domain());
     
@@ -491,6 +510,7 @@ function draw(data, RSIData, volumeData) {
             .call(crosshair);
         //.call(zoom);
 
+        //取得月&季線最小值，設定Y軸，避免只用收盤價設定Y軸，均線下緣超過圖表
         $(ma20.slice(59, 159)).each(function(idx, el) {
             if (el.value < minMA) {
                 minMA = el.value;
@@ -503,6 +523,7 @@ function draw(data, RSIData, volumeData) {
         });
     });
 
+    //----------設定Y軸範圍----------
     yAxisCorrect = [
         {
             date: data[0].date,
@@ -521,11 +542,15 @@ function draw(data, RSIData, volumeData) {
         yAxisCorrect);
 
     y.domain(techan.scale.plot.ohlc(dataYCorrect, candlestick.accessor()).domain());
+    //----------設定Y軸範圍----------
+
     // 畫X軸 
     svg.selectAll("g.x.axis")
         .call(xAxis.ticks(7).tickFormat(d3.timeFormat("%m/%d")).tickSize(-height, -height));
     //畫K線圖Y軸
     svg.selectAll("g.y.axis").call(yAxis.ticks(10).tickSize(-width, -width));
+    svg.selectAll("g#YaxisR").call(yAxisR.ticks(10).tickSize(width + 15, width + 15));
+    
     //畫Ｋ線圖
     svg.select("g.candlestick").attr("clip-path", "url(#candlestickClip)").datum(defaultCandlestick)
         .call(candlestick);
@@ -558,7 +583,6 @@ function draw(data, RSIData, volumeData) {
     $('span#NowDT').html(GmtToYMD(data[99].date));
     $('span#RSI').html(rsiData[99].rsi.toFixed(2));
 }
-
 
 function CompareHighLow(parameters) {
     $(parameters).each(function(idx, el) {
@@ -718,6 +742,7 @@ function redraw(data, RSIData) {
     yVolume.domain(techan.scale.plot.volume(data.slice(59, techKCount)).domain());
     //畫K線圖Y軸
     svg.selectAll("g.y.axis").call(yAxis.ticks(10).tickSize(-width, -width));
+    svg.selectAll("g#YaxisR").call(yAxisR.ticks(10).tickSize(width + 15, width + 15));
     $('g[clip-path="url(#clip)"]').remove();
 
     var ma20 = techan.indicator.sma().period(20)(data.slice(0, techKCount));
@@ -753,18 +778,6 @@ function redraw(data, RSIData) {
             RobotIsFirst = 'Y';
         }
     }
-
-    //if (bsLineCount >= 1) {
-    //    if (sPrice_Robot === 0 && parseFloat(data[techKCount].close) > highestPrice) {
-    //        highestPrice = parseFloat(data[techKCount].close); //更新目前最高價
-    //    } else if (sPrice_Robot === 0 && data[techKCount].close <= (highestPrice * 0.9).toFixed(2)) {
-    //        //觸發機器人賣出
-    //        sPrice_Robot = parseFloat(data[techKCount].close);
-    //        spread_Robot = (parseFloat(data[techKCount].close) - bPrice).toFixed(2); //獲利
-    //    } else if (sPrice_Robot === 0 && techKCount === 159) {
-    //        spread_Robot = (parseFloat(data[159].close) - bPrice).toFixed(2); //用最後這天當結算價
-    //    }
-    //}
 
     chart.append("rect")
         .attr("class", "volumeBar")
@@ -809,5 +822,4 @@ function redraw(data, RSIData) {
     $('span#RSI').html(rsiData[count - 1].rsi.toFixed(2));
     $('span#TrigPrice_Robot').html(sPrice_Robot);
     count++;
-    //.call(zoom);
 }

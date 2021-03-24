@@ -10,6 +10,16 @@ using static StockVSGame.Entity.Home.HomeEntity;
 
 namespace StockVSGame
 {
+    #region - Definition -
+
+    public class StockInfo
+    {
+        public string IsChoose { get; set; }
+        public string StockID { get; set; }
+        public string Date { get; set; }
+    }
+    #endregion
+
     public class HomeIndexModel
     {
         public HomeIndexModel()
@@ -33,6 +43,7 @@ namespace StockVSGame
         /// </summary>
         public int Percent { get; set; }
         public string OnOff { get; set; }
+        public List<StockInfo> StockInfoList { get; set; }
         public Tech TechData = new Tech();
         #endregion
 
@@ -49,7 +60,7 @@ namespace StockVSGame
         {
             try
             {
-                List<List<Stock>> stockList = _entity.GetStockList();
+                List<List<Stock>> stockList = _entity.GetStockList(StockInfoList);
 
                 if (stockList.Any())
                 {
@@ -139,11 +150,23 @@ namespace StockVSGame
 
         public void GetSetting()
         {
+            StockInfoList = new List<StockInfo>();
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(HttpContext.Current.Server.MapPath("~/App_Data/Setting.xml"));
             var data = xmlDoc.SelectNodes("/Settings").Cast<XmlNode>().SingleOrDefault();
             Percent = int.Parse(data.SelectSingleNode("Percent").InnerText);
             OnOff = data.SelectSingleNode("OnOff").InnerText;
+            StockInfoList.AddRange(xmlDoc.SelectNodes("/Settings/StockInfo/STK").Cast<XmlNode>()
+                .Select(n =>
+                {
+                    XmlElement datas = (XmlElement)n;
+                    return new StockInfo
+                    {
+                        IsChoose = datas.GetAttribute("選擇"),
+                        StockID = datas.GetAttribute("股票代號"),
+                        Date = datas.GetAttribute("起始日期")
+                    };
+                }).ToList());
         }
     }
 }

@@ -7,7 +7,7 @@ namespace StockVSGame.Controllers
         // GET: AdminIndex
         public ActionResult Index(AdminIndexModel model)
         {
-            if (IsPostBack == false)
+            if (Request.RequestType == "GET")
             {
                 model.Init();
             }

@@ -24,7 +24,7 @@ namespace StockVSGame.Controllers
             }
 
             bool isCurrentUrl = string.Compare(filterContext.HttpContext.Request.Url.AbsoluteUri,
-                                    Request.Headers["Referer"]?.ToString(),
+                                    filterContext.HttpContext.Request.UrlReferrer?.ToString(),
                                     StringComparison.CurrentCultureIgnoreCase) == 0;
 
             _isPostBack = isPost && isCurrentUrl;

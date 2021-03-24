@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
+using System.Globalization;
 using System.Linq;
 using System.Text;
 
@@ -42,38 +43,13 @@ namespace StockVSGame.Entity.Home
             public string ADX { get; set; }
         }
 
-        public List<List<Stock>> GetStockList()
+        public List<List<Stock>> GetStockList(List<StockInfo> stockIDList)
         {
-            DataTable tableRow = new DataTable();
-            List<string> stockIDList = new List<string>();
             List<List<Stock>> stockInfoList = new List<List<Stock>>();
-
-            var commandTextStock = new StringBuilder(string.Join(Environment.NewLine, new object[]
-            {
-                "SELECT TOP 1 股票代號",
-                "  FROM 日收盤表排行",
-                " WHERE LEN(股票代號) <= 4 AND 股票代號 = '3014'",
-                " ORDER BY NEWID()"
-            }));
-
-            using (SqlConnection connection = new SqlConnection(_conn))
-            {
-                using (SqlCommand cmd = new SqlCommand(commandTextStock.ToString(), connection))
-                {
-                    connection.Open();
-                    SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                    using (SqlDataReader reader = cmd.ExecuteReader())
-                    {
-                        while (reader.Read())
-                        {
-                            stockIDList.Add(reader.GetString(0));
-                        }
-                    }
-                }
-            }
-
+            DataTable tableRow = new DataTable();
             foreach (var row in stockIDList)
             {
+                var dt = DateTime.ParseExact(row.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddDays(-160).ToString("yyyyMMdd");
                 var commandText = new StringBuilder(string.Join(Environment.NewLine, new object[]
                 {
                     "SELECT TOP 220 日期",
@@ -100,7 +76,7 @@ namespace StockVSGame.Entity.Home
                     "     , '18.98' AS DIB",
                     "     , '19.69' AS ADX",
                     "  FROM 日收盤表排行",
-                    " WHERE 股票代號 = '"+ row +"' AND 日期 >= '20180101'",
+                    " WHERE 股票代號 = '"+ row.StockID +"' AND 日期 >= '"+ dt +"'",
                     " ORDER BY 日期 DESC"
                 }));
 

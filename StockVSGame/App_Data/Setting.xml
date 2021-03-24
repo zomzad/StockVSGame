@@ -1,13 +1,25 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Settings>
-  <MkTContent>你好
+  <MkTContent>輸入你想要寫的內容...
+                
+                
+                
+                
                 
                 </MkTContent>
   <OnOff>O</OnOff>
   <!--開:O 關:F-->
-  <ActivityUrl>https://www.google.com/</ActivityUrl>
+  <ActivityUrl>
+  </ActivityUrl>
   <StockNum>1</StockNum>
-  <IsRadom>N</IsRadom>
-  <!--隨機:Y 順序:N-->
-  <Percent>20</Percent>
+  <StockInfo>
+    <STK 股票代號="2881" 起始日期="2020-03-10" 選擇="Y" />
+    <STK 股票代號="2331" 起始日期="2021-03-23" 選擇="Y" />
+    <STK 股票代號="2330" 起始日期="2021-01-15" 選擇="N" />
+    <STK 股票代號="5880" 起始日期="2021-02-12" 選擇="Y" />
+    <STK 股票代號="0050" 起始日期="2021-03-23" 選擇="Y" />
+  </StockInfo>
+  <IsRadom>
+  </IsRadom>
+  <Percent>10</Percent>
 </Settings>

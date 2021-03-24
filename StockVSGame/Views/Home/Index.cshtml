@@ -67,13 +67,13 @@
                             <div class="text-danger">買進價:<span id="BPrice"></span></div>
                         </div>
                         <div class="col-4 text-white">
-                            <div>起始日: <span id="SDT">2017/10/20</span></div>
+                            <div>起始日: <span id="SDT">0</span></div>
                             <div class="text-warning">20MA: <span id="MAMonth">0</span></div>
                             <div class="text-info">60MA: <span id="MASeason">0</span></div>
                             <div class="text-success">賣出價:<span id="SPrice"></span></div>
                         </div>
                         <div class="col-4 text-white">
-                            <div>現在: <span id="NowDT">2018/03/22</span></div>
+                            <div>現在: <span id="NowDT">0</span></div>
                             <div>5日RSI值: <span id="RSI">61.67</span></div>
                             <div>移動鎖利停利: @Model.Percent%</div>
                             <div>移動鎖利價:<span id="TrigPrice_Robot"></span></div>
@@ -82,6 +82,24 @@
                     <div class="col-12">
                         <div id="CandlestickChart"></div>
                         @*<img src="~/Content/img/chart1.png" style="width:80vW;height: 320px">*@
+                    </div>
+                </td>
+            </tr>
+            <tr class="" align="center">
+                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                    @*<div class="row col-10 no-gutters" align="left">
+                        <div class="col-4 text-white">成交量</div>
+                    </div>
+                    <div class="col-12">
+                        <img src="~/Content/img/chart2.png" style="width:80vW;height: 120px">
+                    </div>*@
+
+                    <div class="row col-10 no-gutters" align="left">
+                        <div class="col-4 text-white">成交量</div>
+                    </div>
+                    <div class="col-12">
+                        <div id="VolumeChart"></div>
+                        @*<img src="~/Content/img/chart3.png" style="width:80vW;height: 120px">*@
                     </div>
                 </td>
             </tr>
