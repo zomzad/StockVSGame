@@ -43,106 +43,91 @@
     </style>
 </head>
 <body>
-    <div class="table-responsive">
-        <table id="" border="0" cellpadding="0" cellspacing="0" class="table table-borderless table-striped">
-            <tr>
-                <td background="~/Content/img/bg_01.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-            </tr>
-            <tr class="" align="center">
-                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                    <div class="pb-0 mb-0">
-                        <div class="row col-10 no-gutters px-0" align="center">
-                            <img src="~/Content/img/banner.svg" style="width:80vW;">
+<div id="Start" class="table-responsive" style="display: none">
+</div>
+        <div id="Play" class="table-responsive">
+            <table id="" border="0" cellpadding="0" cellspacing="0" class="table table-borderless table-striped">
+                <tr>
+                    <td background="~/Content/img/bg_01.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
+                </tr>
+                <tr class="" align="center">
+                    <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                        <div class="pb-0 mb-0">
+                            <div class="row col-10 no-gutters px-0" align="center">
+                                <img src="~/Content/img/banner.svg" style="width:80vW;">
+                            </div>
                         </div>
-                    </div>
-                </td>
-            </tr>
-            <tr class="" align="center">
-                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                    <div class="row col-10 no-gutters" align="left">
-                        <div class="col-4 text-white">
-                            <div><span id="Stock"></span></div>
-                            <div>區間最高:<span id="High">0</span></div>
-                            <div>區間最低:<span id="Low">0</span></div>
-                            <div class="text-danger">買進價:<span id="BPrice"></span></div>
+                    </td>
+                </tr>
+                <tr class="" align="center">
+                    <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                        <div class="row col-10 no-gutters" align="left">
+                            <div class="col-4 text-white">
+                                <div><span id="Stock"></span></div>
+                                <div>區間最高:<span id="High">0</span></div>
+                                <div>區間最低:<span id="Low">0</span></div>
+                                <div class="text-danger">買進價:<span id="BPrice"></span></div>
+                            </div>
+                            <div class="col-4 text-white">
+                                <div>起始日: <span id="SDT">0</span></div>
+                                <div class="text-warning">20MA: <span id="MAMonth">0</span></div>
+                                <div class="text-info">60MA: <span id="MASeason">0</span></div>
+                                <div class="text-success">賣出價:<span id="SPrice"></span></div>
+                            </div>
+                            <div class="col-4 text-white">
+                                <div>現在: <span id="NowDT">0</span></div>
+                                <div>5日RSI值: <span id="RSI">61.67</span></div>
+                                <div>移動鎖利停利: @Model.Percent%</div>
+                                <div>移動鎖利價:<span id="TrigPrice_Robot"></span></div>
+                            </div>
                         </div>
-                        <div class="col-4 text-white">
-                            <div>起始日: <span id="SDT">0</span></div>
-                            <div class="text-warning">20MA: <span id="MAMonth">0</span></div>
-                            <div class="text-info">60MA: <span id="MASeason">0</span></div>
-                            <div class="text-success">賣出價:<span id="SPrice"></span></div>
+                        <div class="col-12">
+                            <div id="CandlestickChart"></div>
+                            @*<img src="~/Content/img/chart1.png" style="width:80vW;height: 320px">*@
                         </div>
-                        <div class="col-4 text-white">
-                            <div>現在: <span id="NowDT">0</span></div>
-                            <div>5日RSI值: <span id="RSI">61.67</span></div>
-                            <div>移動鎖利停利: @Model.Percent%</div>
-                            <div>移動鎖利價:<span id="TrigPrice_Robot"></span></div>
+                    </td>
+                </tr>
+                <tr class="" align="center">
+                    <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                        <div class="row col-10 no-gutters" align="left">
+                            <div class="col-4 text-white">成交量</div>
                         </div>
-                    </div>
-                    <div class="col-12">
-                        <div id="CandlestickChart"></div>
-                        @*<img src="~/Content/img/chart1.png" style="width:80vW;height: 320px">*@
-                    </div>
-                </td>
-            </tr>
-            <tr class="" align="center">
-                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                    @*<div class="row col-10 no-gutters" align="left">
-                        <div class="col-4 text-white">成交量</div>
-                    </div>
-                    <div class="col-12">
-                        <img src="~/Content/img/chart2.png" style="width:80vW;height: 120px">
-                    </div>*@
+                        <div class="col-12">
+                            <div id="VolumeChart">EEEEEEEEEEEEEEEEEEEEEE</div>
+                            @*<img src="~/Content/img/chart3.png" style="width:80vW;height: 120px">*@
+                        </div>
+                    </td>
+                </tr>
+                <tr class="" align="center">
+                    <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                        <div class="row col-10 no-gutters" align="left">
+                            <div class="col-4 text-white">RSI</div>
+                        </div>
+                        <div class="col-12">
+                            <div id="RSIChart"></div>
+                        </div>
+                    </td>
+                </tr>
+                <tr class="" align="center">
+                    <td background="~/Content/img/bg_02.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
+                        <div class="d-flex col-11 align-items-center" align="center">
+                            <a href="#" class="col">
+                                <img id="StartBtn" src="~/Content/img/bt_play0.svg" class="img-fluid">
+                            </a>
+                            <a href="#" class="col">
+                                <img id="BuyBtn" src="~/Content/img/bt_buy0.svg" class="img-fluid">
+                            </a>
+                            <a href="#" class="col">
+                                <img id="SellBtn" src="~/Content/img/bt_sell0.svg" class="img-fluid">
+                            </a>
+                        </div>
+                    </td>
+                </tr>
 
-                    <div class="row col-10 no-gutters" align="left">
-                        <div class="col-4 text-white">成交量</div>
-                    </div>
-                    <div class="col-12">
-                        <div id="VolumeChart"></div>
-                        @*<img src="~/Content/img/chart3.png" style="width:80vW;height: 120px">*@
-                    </div>
-                </td>
-            </tr>
-            <tr class="" align="center">
-                <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                    @*<div class="row col-10 no-gutters" align="left">
-                        <div class="col-4 text-white">成交量</div>
-                    </div>
-                    <div class="col-12">
-                        <img src="~/Content/img/chart2.png" style="width:80vW;height: 120px">
-                    </div>*@
-
-                    <div class="row col-10 no-gutters" align="left">
-                        <div class="col-4 text-white">RSI</div>
-                    </div>
-                    <div class="col-12">
-                        <div id="RSIChart"></div>
-                        @*<img src="~/Content/img/chart3.png" style="width:80vW;height: 120px">*@
-                    </div>
-                </td>
-            </tr>
-
-
-            <tr class="" align="center">
-                <td background="~/Content/img/bg_02.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                    <div class="d-flex col-11 align-items-center" align="center">
-                        <a href="#" class="col">
-                            <img id="StartBtn" src="~/Content/img/bt_play0.svg" class="img-fluid">
-                        </a>
-                        <a href="#" class="col">
-                            <img id="BuyBtn" src="~/Content/img/bt_buy0.svg" class="img-fluid">
-                        </a>
-                        <a href="#" class="col">
-                            <img id="SellBtn" src="~/Content/img/bt_sell0.svg" class="img-fluid">
-                        </a>
-                    </div>
-                </td>
-            </tr>
-
-            <tr>
-                <td background="~/Content/img/bg_04.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="pt-0">&nbsp;&nbsp;<br>&nbsp;&nbsp;</td>
-            </tr>
-        </table>
-    </div>
+                <tr>
+                    <td background="~/Content/img/bg_04.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="pt-0">&nbsp;&nbsp;<br>&nbsp;&nbsp;</td>
+                </tr>
+            </table>
+        </div>
 </body>
 </html>

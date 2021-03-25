@@ -162,9 +162,12 @@ namespace StockVSGame
                     XmlElement datas = (XmlElement)n;
                     return new StockInfo
                     {
-                        IsChoose = datas.GetAttribute("選擇"),
-                        StockID = datas.GetAttribute("股票代號"),
-                        Date = datas.GetAttribute("起始日期")
+                        //IsChoose = datas.GetAttribute("選擇"),
+                        //StockID = datas.GetAttribute("股票代號"),
+                        //Date = datas.GetAttribute("起始日期")
+                        IsChoose = "Y",
+                        StockID = "3014",
+                        Date = "2020-07-16"
                     };
                 }).ToList());
         }
