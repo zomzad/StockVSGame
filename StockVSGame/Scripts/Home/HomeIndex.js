@@ -1,10 +1,24 @@
 ﻿var serverPath = window.location.host.indexOf('localhost') >= 0 ? '' : '/StockVSRobot';
 var svg, svgVolume, svgRSI;
+var interval;
+var yAxisCorrect;
+//----------統計量----------
+var highestPrice = 0;
+var lowestPrice = 9999;
+var bsCount = 0;
+var techKCount = 59;
+var arrIndex = 100;
+var techKFullData = null;
+var rsiFullData = null;
+var volumeFullData = null;
+var bsLineXCoordinate = 0;
+
 //----------K線圖----------
 var margin = { top: 20, right: 50, bottom: 30, left: 50 },
     width = 580 - margin.left - margin.right,
     height = 200 - margin.top - margin.bottom;
 var parseDate = d3.timeParse("%Y%m%d");
+var monthDate = d3.timeParse("%Y%m");
 var x = techan.scale.financetime()
     .range([0, width]);
 var y = d3.scaleLinear()
@@ -54,6 +68,36 @@ var xAxisVol = d3.axisBottom(xVol);
 var yAxisVol = d3.axisLeft(yVol)
     .tickFormat(d3.format(",.3s"));
 
+//----------座標十字線----------
+var ohlcAnnotation = techan.plot.axisannotation()
+    .axis(yAxis)
+    .orient('left')
+    .format(d3.format(',.2f'));
+var timeAnnotation = techan.plot.axisannotation()
+    .axis(xAxis)
+    .orient('bottom')
+    .format(d3.timeFormat('%Y-%m-%d'))
+    .translate([0, height]);
+var crosshairY = d3.scaleLinear()
+    .range([height, 0]);
+var crosshair = techan.plot.crosshair()
+    .xScale(x)
+    .yScale(crosshairY)
+    .xAnnotation(timeAnnotation)
+    .yAnnotation(ohlcAnnotation);
+var textSvg = d3.select("body").append("svg")
+    .attr("width", width + margin.left + margin.right)
+    .attr("height", margin.top + margin.bottom)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+var svgText = textSvg.append("g")
+    .attr("class", "description")
+    .append("text")
+    .attr("y", 6)
+    .attr("dy", ".71em")
+    .style("text-anchor", "start")
+    .text("");
+
 $(document).ready(function() {
     EventBind();
     svg = d3.select("div#CandlestickChart")
@@ -80,21 +124,20 @@ $(document).ready(function() {
 
 function EventBind(parameters) {
     $('#StartBtn').click(function () {
-        if (techKCount < 219 || bsLineCount === 2) {
+        if (techKCount < 219 || bsCount === 2) {
             if (interval === undefined || interval === null) {
                 $(this).attr('src', serverPath + '/Content/img/bt_pause1.svg');
                 interval = setInterval(function () {
-                        if (techKCount < chartData.length) {
+                        if (techKCount < techKFullData.length) {
                             techKCount++;
-                            redraw(chartData, rsiChartData);
-                            $('#techK').html(count);
+                            redraw(techKFullData, rsiFullData, volumeFullData);
                         } else {
                             clearInterval(interval);
                         }
                     },
                     1000);
             } else {
-                if (bsLineCount < 2) {
+                if (bsCount < 2) {
                     $(this).attr('src', serverPath + '/Content/img/bt_play0.svg');
                     clearInterval(interval);
                     interval = null;
@@ -102,6 +145,103 @@ function EventBind(parameters) {
             }
         }
     });
+
+    $('#BuyBtn').click(function () {
+        if (bsCount < 2 && interval !== null && interval !== undefined) {
+            DrawFlag();
+        }
+    });
+
+    $('#SellBtn').click(function () {
+        if (bsCount < 2 && bsCount > 0 && interval !== null) {
+            DrawFlag();
+        }
+    });
+}
+
+function DrawFlag(parameters) {
+    var rectGroup = svg.append("g").attr("id", "flag")
+        .selectAll("text").data(techKFullData).enter();
+    var bsLineStyle = [
+        { rect: bsLineXCoordinate - 49.5, text: bsLineXCoordinate - 25, color: 'red', bs: '買進' },
+        { rect: bsLineXCoordinate - 0.5, text: bsLineXCoordinate + 25, color: 'green', bs: '賣出' }
+    ];
+
+    //買進時先預設買進價為最高價
+    if (bsCount === 0) {
+        highestPrice = parseFloat(techKFullData[techKCount - 1].close);
+        bPrice = highestPrice;
+        $('span#BPrice').html(bPrice);
+    }
+
+    //賣出
+    if (bsCount === 1) {
+        $('span#SPrice').html(parseFloat(techKFullData[techKCount - 1].close));
+        spread_Man = (parseFloat(techKFullData[techKCount - 1].close) - bPrice).toFixed(2);
+        clearInterval(interval);
+        interval = null;
+
+        interval = setInterval(function () {
+            if (techKCount < techKFullData.length) {
+                techKCount++;
+                redraw(techKFullData, rsiFullData, volumeFullData);
+                $('#techK').html(count);
+            } else {
+                clearInterval(interval);
+            }
+        },
+            200);
+    }
+
+    //線條
+    rectGroup.append('line').attr('x1', bsLineXCoordinate).attr('y1', 10).attr('x2', bsLineXCoordinate).attr('y2', 205)
+        .style('stroke', bsLineStyle[bsCount].color).style('stroke-width', 1);
+    //文字框
+    rectGroup.append("rect")
+        .attr("x", bsLineStyle[bsCount].rect) //朝左
+        .attr("y",
+            function (d) {
+                if (d.point !== undefined) {
+                    return getRectXY(xScale(d.name)).y;
+                }
+            })
+        .attr("width", '50px')
+        .attr("height", '15px')
+        .attr("fill", bsLineStyle[bsCount].color)
+        .attr("class",
+            function (d) {
+                if (d.point !== undefined) {
+                    if (d.point.type === 'rise') {
+                        return "rect_rise";
+                    } else {
+                        return "rect_fall";
+                    }
+                } else {
+                    return 'none';
+                }
+            });
+
+    //文字
+    rectGroup.append("text")
+        .attr("x", bsLineStyle[bsCount].text) //朝左
+        .attr("y", 10)
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+            return bsLineStyle[bsCount].bs + ': ' + techKFullData[techKCount - 1].close;
+        })
+        .style('fill', '#FFFFFF')
+        .attr("class",
+            function (d) {
+                if (d.point !== undefined) {
+                    if (d.point.type === 'rise') {
+                        return "rect_txt_rise";
+                    } else {
+                        return "rect_txt_fall";
+                    }
+                }
+            });
+
+    bsCount += 1;
 }
 
 function loadJSON(file, type) {
@@ -157,7 +297,11 @@ function loadJSON(file, type) {
                 low: +d[5],
                 close: +d[6]
             };
-        }).sort(function (a, b) { return d3.ascending(accessor.d(a), accessor.d(b)); });
+        }).sort(function (a, b) { return d3.ascending(accessorVol.d(a), accessorVol.d(b)); });
+
+        techKFullData = data;
+        rsiFullData = dataRSI;
+        volumeFullData = dataVol;
 
         svg.append("g")
             .attr("class", "candlestick");
@@ -207,21 +351,23 @@ function loadJSON(file, type) {
             .style("text-anchor", "end")
             .text("Volume");
 
+        DisplayInfo(jsonData);
         draw(data, dataRSI, dataVol);
     });
 }
 
 function draw(data, RSIData, VolumeData) {
-    debugger;
     var ma20, ma60;
     var minMA = 9999;
     var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
+    techKCount = techKCount + 99;
 
     //K線&均線
     x.domain(data.slice(59, data.length - 1).map(candlestick.accessor().d));
     ma20 = techan.indicator.sma().period(20)(data.slice(0, 159));
     ma60 = techan.indicator.sma().period(60)(data.slice(0, 159));
     defaultCandlestick = data.slice(59, 158);
+    CompareHighLow(defaultCandlestick);
     $(ma20.slice(59, 159)).each(function (idx, el) {
         if (el.value < minMA) {
             minMA = el.value;
@@ -254,7 +400,7 @@ function draw(data, RSIData, VolumeData) {
     //----------K線&均線 設定Y軸範圍----------
 
     svg.selectAll("g.candlestick").datum(defaultCandlestick).call(candlestick);
-    svg.selectAll("g.x.axis").call(xAxis);
+    svg.selectAll("g.x.axis").call(xAxis.ticks(7).tickFormat(d3.timeFormat("%m/%d")));
     svg.selectAll("g.y.axis").call(yAxis);
     svg.select("g.sma.ma-1").attr("clip-path", "url(#candlestickClip)")
         .datum(ma20).call(sma0);
@@ -265,6 +411,12 @@ function draw(data, RSIData, VolumeData) {
         .append("svg:rect")
         .attr("width", width)
         .attr("height", height);
+    svg.append("g")
+        .attr("class", "crosshair")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("pointer-events", "all")
+        .call(crosshair);
 
     //RSI
     xRSI.domain(rsiData.map(rsi.accessor().d));
@@ -280,11 +432,85 @@ function draw(data, RSIData, VolumeData) {
     svgVolume.selectAll("g.x.axis").call(xAxisVol);
     svgVolume.selectAll("g.y.axis").call(yAxisVol);
 
-    //$('span#High').html(highestPrice);
-    //$('span#Low').html(lowestPrice);
-    //$('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
-    //$('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
-    //$('span#SDT').html(GmtToYMD(data[59].date));
-    //$('span#NowDT').html(GmtToYMD(data[99].date));
-    //$('span#RSI').html(rsiData[99].rsi.toFixed(2));
+    $('span#High').html(highestPrice);
+    $('span#Low').html(lowestPrice);
+    $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
+    $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
+    $('span#SDT').html(GetYMD(data[59].date));
+    $('span#NowDT').html(GetYMD(data[99].date));
+    $('span#RSI').html(rsiData[99].rsi.toFixed(2));
+}
+
+function GetYMD(parameters) {
+    var dt = new Date(parameters);
+    var year = dt.getFullYear();
+    var month = dt.getMonth() + 1;
+    var date = dt.getDate();
+
+    if (month < 10) {
+        month = '0' + month;
+    }
+    if (date < 10) {
+        date = '0' + date;
+    }
+
+    return year + '/' + month + '/' + date;
+}
+
+function CompareHighLow(parameters) {
+    $(parameters).each(function (idx, el) {
+        if (el.close > highestPrice) {
+            highestPrice = el.close;
+        }
+
+        if (el.close < lowestPrice) {
+            lowestPrice = el.close;
+        }
+    });
+
+    sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
+    $('span#TrigPrice_Robot').html(sPrice_Robot);//觸發出場價
+}
+
+function redraw(data, RSIData, VolumeData) {
+    var ma20, ma60;
+    var dataYCorrect = $.extend([], [], data.slice(59, techKCount), yAxisCorrect);
+    var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
+
+    //K線&均線
+    ma20 = techan.indicator.sma().period(20)(data.slice(0, techKCount));
+    ma60 = techan.indicator.sma().period(60)(data.slice(0, techKCount));
+    y.domain(techan.scale.plot.ohlc(dataYCorrect, candlestick.accessor()).domain());
+
+    svg.selectAll("g.candlestick").datum(data.slice(59, techKCount)).call(candlestick);
+    svg.selectAll("g.y.axis").call(yAxis);
+    svg.select("g.sma.ma-1").attr("clip-path", "url(#candlestickClip)")
+        .datum(ma20).call(sma0);
+    svg.select("g.ema.ma-2").attr("clip-path", "url(#candlestickClip)")
+        .datum(ma60).call(sma0);
+    svg.append("defs").append("svg:clipPath")
+        .attr("id", "candlestickClip")
+        .append("svg:rect")
+        .attr("width", width)
+        .attr("height", height);
+    svg.append("g")
+        .attr("class", "crosshair")
+        .attr("width", width)
+        .attr("height", height)
+        .attr("pointer-events", "all")
+        .call(crosshair);
+
+    //RSI
+    svgRSI.selectAll("g.rsi").datum(rsiData.slice(0, arrIndex++)).call(rsi);
+    svgRSI.selectAll("g.x.axis").call(xAxisRSI);
+    svgRSI.selectAll("g.y.axis").call(yAxisRSI);
+
+    //交易量
+    svgVolume.selectAll("g.volume").datum(VolumeData.slice(59, techKCount)).call(volume);
+    svgVolume.selectAll("g.x.axis").call(xAxisVol);
+    svgVolume.selectAll("g.y.axis").call(yAxisVol);
+}
+
+function DisplayInfo(parameters) {
+    $('span#Stock').html(parameters[0][2] + parameters[0][1]);
 }
