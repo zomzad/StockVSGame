@@ -52,12 +52,6 @@
                 </textarea>
                 </td>
             </tr>
-            <tr id="StockInfo">
-                <th>抓取股票檔數</th>
-                <td>
-                    <input type="number" min="1" max="99" name="StockNum" value="@Model.StockNum">
-                </td>
-            </tr>
             @foreach (var row in Model.StockInfoList)
             {
                 string rowChoose = "StockInfoList[" + rowCount + "].IsChoose";

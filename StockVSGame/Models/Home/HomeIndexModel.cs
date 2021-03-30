@@ -43,6 +43,9 @@ namespace StockVSGame
         /// </summary>
         public int Percent { get; set; }
         public string OnOff { get; set; }
+
+        public string IsRadom { get; set; }
+        public string StockTotalNum { get; set; }
         public List<StockInfo> StockInfoList { get; set; }
         public Tech TechData = new Tech();
         #endregion
@@ -64,6 +67,7 @@ namespace StockVSGame
 
                 if (stockList.Any())
                 {
+                    StockTotalNum = stockList.Count.ToString();
                     MaCount(new List<int> { 20, 60 }, stockList[0]);//計算月線&季線
 
                     //轉換資料格式適合data.json使用
@@ -156,18 +160,20 @@ namespace StockVSGame
             var data = xmlDoc.SelectNodes("/Settings").Cast<XmlNode>().SingleOrDefault();
             Percent = int.Parse(data.SelectSingleNode("Percent").InnerText);
             OnOff = data.SelectSingleNode("OnOff").InnerText;
+            IsRadom = data.SelectSingleNode("IsRadom").InnerText;
             StockInfoList.AddRange(xmlDoc.SelectNodes("/Settings/StockInfo/STK").Cast<XmlNode>()
+                .Where(x => ((XmlElement)x).GetAttribute("選擇") == "Y")
                 .Select(n =>
                 {
                     XmlElement datas = (XmlElement)n;
                     return new StockInfo
                     {
-                        //IsChoose = datas.GetAttribute("選擇"),
-                        //StockID = datas.GetAttribute("股票代號"),
-                        //Date = datas.GetAttribute("起始日期")
-                        IsChoose = "Y",
-                        StockID = "3014",
-                        Date = "2020-07-16"
+                        IsChoose = datas.GetAttribute("選擇"),
+                        StockID = datas.GetAttribute("股票代號"),
+                        Date = datas.GetAttribute("起始日期")
+                        //IsChoose = "Y",
+                        //StockID = "3014",
+                        //Date = "2020-07-16"
                     };
                 }).ToList());
         }

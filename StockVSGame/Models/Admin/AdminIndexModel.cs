@@ -27,7 +27,6 @@ namespace StockVSGame
         public string OnOff { get; set; }
         public string ActivityUrl { get; set; }
         public string MkTContent { get; set; }
-        public int StockNum { get; set; }
         public int Percent { get; set; }
         public string IsRadom { get; set; }
 
@@ -61,7 +60,6 @@ namespace StockVSGame
             OnOff = data.SelectSingleNode("OnOff").InnerText;
             MkTContent = data.SelectSingleNode("MkTContent").InnerText;
             ActivityUrl = data.SelectSingleNode("ActivityUrl").InnerText;
-            StockNum = int.Parse(data.SelectSingleNode("StockNum").InnerText);
             Percent = int.Parse(data.SelectSingleNode("Percent").InnerText);
             IsRadom = data.SelectSingleNode("IsRadom").InnerText;
 
@@ -103,7 +101,6 @@ namespace StockVSGame
                 data.SelectSingleNode("OnOff").InnerText = OnOff;
                 data.SelectSingleNode("MkTContent").InnerText = MkTContent;
                 data.SelectSingleNode("ActivityUrl").InnerText = ActivityUrl;
-                data.SelectSingleNode("StockNum").InnerText = StockNum.ToString();
                 data.SelectSingleNode("Percent").InnerText = Percent.ToString();
                 data.SelectSingleNode("IsRadom").InnerText = IsRadom;
                 data.SelectSingleNode("StockInfo").RemoveAll();

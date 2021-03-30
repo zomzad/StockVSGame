@@ -111,6 +111,8 @@
     <Content Include="Content\img\bt_buy0.svg" />
     <Content Include="Content\img\bt_buy1.png" />
     <Content Include="Content\img\bt_buy1.svg" />
+    <Content Include="Content\img\bt_fightingagain.svg" />
+    <Content Include="Content\img\bt_lottery0.svg" />
     <Content Include="Content\img\bt_pause1.svg" />
     <Content Include="Content\img\bt_play0.png" />
     <Content Include="Content\img\bt_play0.svg" />
@@ -123,6 +125,7 @@
     <Content Include="Content\img\chart1.png" />
     <Content Include="Content\img\chart2.png" />
     <Content Include="Content\img\chart3.png" />
+    <Content Include="Content\img\eDM_form_top.jpg" />
     <Content Include="Content\img\LOGO.png" />
     <Content Include="Global.asax" />
     <Content Include="Scripts\Home\HomeIndex.js" />
