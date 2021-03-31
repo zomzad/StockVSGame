@@ -122,7 +122,7 @@ var svgText = textSvg.append("g")
     .style("text-anchor", "start")
     .text("");
 
-$(document).ready(function() {
+$(document).ready(function () {
     EventBind();
     svg = d3.select("div#CandlestickChart")
         .append("svg")
@@ -147,11 +147,6 @@ $(document).ready(function() {
 });
 
 function EventBind(parameters) {
-    $('#InitBtn').click(function () {
-        $('div#Start').hide();
-        $('div#Play').show();
-    });
-
     $('#StartBtn').click(function () {
         if (techKCount < 219) {
             if ((interval === undefined || interval === null) && $('#StartBtn', $('div#Play')).attr('src').indexOf('bt_play0') >= 0) {
@@ -176,7 +171,7 @@ function EventBind(parameters) {
     });
 
     $('#BuyBtn').click(function () {
-        if (bsCount < 2 && interval !== null && interval !== undefined) {
+        if (bsCount < 2 && bsCount !== 1 && interval !== null && interval !== undefined) {
             DrawFlag();
         }
     });
@@ -190,8 +185,17 @@ function EventBind(parameters) {
     $('#FightAgainBtn').click(function () {
         $('table tr', 'div#Play').show();
         $('div#Result').hide();
-        $('div#ResultBtn').hide();
+        $('div#Chart').html('');
+        $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play0.svg');
+        $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buy0.svg');
+        $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
+        svg.selectAll("div#CandlestickChart").remove();//刪除K線圖
+        svg.selectAll("div#RSIChart").remove();//刪除RSI
+        svg.selectAll("div#VolumeChart").remove();
+        svg.selectAll("g#Xaxis").remove();//刪除x座標
+        svg.selectAll("g#Yaxis").remove();//刪除y座標
         svg.selectAll("g#flag").remove();
+        svg.selectAll("g#Robotflag").remove();
 
         //----------買賣價初始化----------
         bPrice = 0;
@@ -214,28 +218,19 @@ function EventBind(parameters) {
         bsLineXCoordinate = 0;
 
         loadJSON(window.location.protocol + '//' + window.location.host + serverPath + "/Scripts/data.json", "date");
-        interval = setInterval(function () {
-            if (techKCount < techKFullData.length) {
-                    techKCount++;
-                    redraw(techKFullData, rsiFullData, volumeFullData);
-                } else {
-                    clearInterval(interval);
-                }
-            },
-            1000);
     });
 }
 
-function RobotDrawFlag(parameters) {
+function RobotDrawFlag(XCoordinate) {
     var rectGroup = svg.append("g").attr("id", "Robotflag")
         .selectAll("text").data(techKFullData).enter();
 
     //線條
-    rectGroup.append('line').attr('x1', bsLineXCoordinate).attr('y1', 0).attr('x2', bsLineXCoordinate).attr('y2', 150)
+    rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 150)
         .style('stroke', 'white').style('stroke-width', 1);
     //文字框
     rectGroup.append("rect")
-        .attr("x", bsLineXCoordinate - 49.5) //朝左
+        .attr("x", XCoordinate - 49.5) //朝左
         .attr("y",135)
         .attr("width", '50px')
         .attr("height", '15px')
@@ -255,11 +250,11 @@ function RobotDrawFlag(parameters) {
 
     //文字
     rectGroup.append("text")
-        .attr("x", bsLineXCoordinate - 25) //朝左
+        .attr("x", XCoordinate - 25) //朝左
         .attr("y", 145)
         .attr("text-anchor", "middle")
         .text(function (d) {
-            return '移動鎖利: ' + techKFullData[techKCount].close;
+            return '移動鎖利: ' + techKFullData[techKCount + 1].close;
         })
         .style('fill', '#000')
         .attr("class",
@@ -292,13 +287,15 @@ function DrawFlag(parameters) {
         $('span#Low').html(bPrice);
 
         sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
-        $('span#TrigPrice_Robot').html(sPrice_Robot);//觸發出場價
+        $('span#TrigPrice_Robot').html(sPrice_Robot);//移動鎖利出場價
+        $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buyN.svg');
     }
 
     //賣出
     if (bsCount === 1) {
         $('span#SPrice').html(parseFloat(techKFullData[techKCount].close));
         spread_Man = (parseFloat(techKFullData[techKCount].close) - bPrice).toFixed(2);
+        $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sellN.svg');
         clearInterval(interval);
         interval = null;
 
@@ -635,7 +632,7 @@ function redraw(data, RSIData, VolumeData) {
             sPrice_Robot = data[techKCount].high;
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag();
+            RobotDrawFlag(xScale(data[techKCount].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
@@ -648,7 +645,7 @@ function redraw(data, RSIData, VolumeData) {
             $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag();
+            RobotDrawFlag(xScale(data[techKCount].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
@@ -665,83 +662,90 @@ function redraw(data, RSIData, VolumeData) {
     else if (techKCount === 219) {
         var robot = ((spread_Robot / bPrice) * 100).toFixed(2);
         var man = ((spread_Man / bPrice) * 100).toFixed(2);
-        var resultMsg = '本次交易損益:';
+        var resultMsg = '';
 
-        $('table tr', 'div#Play').not(':eq(2)').hide();
+        $('table tr', 'div#Play').hide();
         $('div#Result').show();
-        $('div#ResultBtn').show();
+        $('div#Result #Man').html(man + '%');
+        $('div#Result #Robot').html(robot + '%');
+        $('div#Chart').html($('div#CandlestickChart').prop("outerHTML"));
+        if (man >= robot) {
+            $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youwin.png');
+        } else {
+            $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youlose.png');
+        }
+        
         exeIndex++;
-        resultMsg += man + '%\r\n' + '透過移動鎖利損益:' + robot + '%\r\n';
-
+        
         if (bsCount === 0) {
-            $('div#Result').html('找不到時機進場嗎?');
+            $('div#Result #Comments').html('找不到時機進場嗎?');
             return false;
         }
 
         if (robot > 0 && man > 0) {
             if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man >= 15) {
-                $('div#Result').html(resultMsg + '您的操作習慣很能掌握大行情，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '您的操作習慣很能掌握大行情，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             } else if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot >= 15) {
-                $('div#Result').html(resultMsg + '您的操作習慣很能掌握大行情，不過獲利也要適時賣出唷,透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '您的操作習慣很能掌握大行情，不過獲利也要適時賣出唷,透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
 
             if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man >= 15) {
-                $('div#Result').html(resultMsg + '太厲害了，不過太早決定出場也很容易錯失大行情唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '太厲害了，不過太早決定出場也很容易錯失大行情唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             } else if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot >= 15) {
-                $('div#Result').html(resultMsg + '太棒了，不過太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '太棒了，不過太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
 
             if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot < 15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
             if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man < 15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
             if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot < 15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
             if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man < 15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
         } else if (robot < 0 && man < 0) {
             if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man < -15) {
-                $('div#Result').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             } else if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot < -15) {
-                $('div#Result').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
             if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man < -15) {
-                $('div#Result').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             } else if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot < -15) {
-                $('div#Result').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
 
             if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot >= 15) {
-                $('div#Result').html(resultMsg + '太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔~');
+                $('div#Result #Comments').html(resultMsg + '太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔~');
             }
             if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man >= -15) {
-                $('div#Result').html(resultMsg + '快快停損雖然可以降低虧損，但是也可能錯失股價上漲潛力唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '快快停損雖然可以降低虧損，但是也可能錯失股價上漲潛力唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
             if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot >= 15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
             if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man >= -15) {
-                $('div#Result').html(resultMsg + '擁抱操作部位忍受行情波動是贏家必備條件，不過損失太大時也要記得停損唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '擁抱操作部位忍受行情波動是贏家必備條件，不過損失太大時也要記得停損唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
         } else {
             if (RobotIsFirst === 'Y' && robot >= 15 && man < -15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
             if (RobotIsFirst === 'Y' && robot >= 15 && man > -15 && man > 0) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷~');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷~');
             }
             if (RobotIsFirst === 'Y' && robot < 15 && robot > 0 && man < -15) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
             if (RobotIsFirst === 'Y' && robot < 15 && robot > 0 && man > -15 && man > 0) {
-                $('div#Result').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷~');
+                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷~');
             }
             if (RobotIsFirst === 'N' && man < 15 && man > 0 && robot > -15 && robot > 0) {
-                $('div#Result').html(resultMsg + '獲利很讚唷，太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+                $('div#Result #Comments').html(resultMsg + '獲利很讚唷，太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
         }
 

@@ -5,9 +5,11 @@ namespace StockVSGame.Controllers
     public partial class HomeController
     {
         [HttpGet]
-        public ActionResult Index()
+        public ActionResult Game()
         {
-            HomeIndexModel model = new HomeIndexModel();
+            HomeGameModel model = new HomeGameModel();
+            model.GetSetting();
+            model.GetStockData();
 
             return View(model);
         }

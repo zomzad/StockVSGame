@@ -111,6 +111,8 @@
     <Content Include="Content\img\bt_buy0.svg" />
     <Content Include="Content\img\bt_buy1.png" />
     <Content Include="Content\img\bt_buy1.svg" />
+    <Content Include="Content\img\bt_buyN.svg" />
+    <Content Include="Content\img\bt_fighting.svg" />
     <Content Include="Content\img\bt_fightingagain.svg" />
     <Content Include="Content\img\bt_lottery0.svg" />
     <Content Include="Content\img\bt_pause1.svg" />
@@ -122,13 +124,16 @@
     <Content Include="Content\img\bt_sell0.svg" />
     <Content Include="Content\img\bt_sell1.png" />
     <Content Include="Content\img\bt_sell1.svg" />
+    <Content Include="Content\img\bt_sellN.svg" />
     <Content Include="Content\img\chart1.png" />
     <Content Include="Content\img\chart2.png" />
     <Content Include="Content\img\chart3.png" />
     <Content Include="Content\img\eDM_form_top.jpg" />
     <Content Include="Content\img\LOGO.png" />
+    <Content Include="Content\img\youlose.png" />
+    <Content Include="Content\img\youwin.png" />
     <Content Include="Global.asax" />
-    <Content Include="Scripts\Home\HomeIndex.js" />
+    <Content Include="Scripts\Home\HomeGame.js" />
     <Content Include="Scripts\jquery-3.5.1.min.js" />
     <Content Include="Scripts\techanjs.js" />
     <Content Include="Scripts\tip.js" />
@@ -138,16 +143,18 @@
     <Compile Include="App_Start\RouteConfig.cs" />
     <Compile Include="Controllers\Admin\AdminController.cs" />
     <Compile Include="Controllers\Admin\AdminControllerI.Index.cs" />
-    <Compile Include="Controllers\DefaultController.cs" />
     <Compile Include="Controllers\Home\HomeController.cs" />
+    <Compile Include="Controllers\Home\HomeController.Game.cs" />
     <Compile Include="Controllers\Home\HomeController.Index.cs" />
     <Compile Include="Controllers\_BaseController.cs" />
-    <Compile Include="Entity\Home\HomeEntity.cs" />
+    <Compile Include="Entity\Home\HomeIndexEntity.cs" />
+    <Compile Include="Entity\Home\HomeGameEntity.cs" />
     <Compile Include="Entity\_BaseEntity.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Admin\AdminIndexModel.cs" />
+    <Compile Include="Models\Home\HomeGameModel.cs" />
     <Compile Include="Models\Home\HomeIndexModel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -161,6 +168,7 @@
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Home\IndexB.cshtml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
+    <Content Include="Views\Home\Game.cshtml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

@@ -13,6 +13,7 @@
                 
                 
                 
+                
                 </MkTContent>
   <OnOff>O</OnOff>
   <!--開:O 關:F-->
@@ -27,5 +28,5 @@
     <STK 股票代號="0050" 起始日期="2021-03-30" 選擇="N" />
   </StockInfo>
   <IsRadom>Y</IsRadom>
-  <Percent>3</Percent>
+  <Percent>10</Percent>
 </Settings>

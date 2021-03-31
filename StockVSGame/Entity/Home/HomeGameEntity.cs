@@ -8,9 +8,9 @@ using System.Text;
 
 namespace StockVSGame.Entity.Home
 {
-    public class HomeEntity : _BaseEntity
+    public class HomeGameEntity : _BaseEntity
     {
-        public HomeEntity(string id) : base(id)
+        public HomeGameEntity(string id) : base(id)
         {
 
         }
