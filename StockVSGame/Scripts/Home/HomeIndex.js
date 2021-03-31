@@ -150,17 +150,6 @@ function EventBind(parameters) {
     $('#InitBtn').click(function () {
         $('div#Start').hide();
         $('div#Play').show();
-        //$('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_pause1.svg');
-
-        //interval = setInterval(function () {
-        //        if (techKCount < techKFullData.length) {
-        //            techKCount++;
-        //            redraw(techKFullData, rsiFullData, volumeFullData);
-        //        } else {
-        //            clearInterval(interval);
-        //        }
-        //    },
-        //    1000);
     });
 
     $('#StartBtn').click(function () {
@@ -204,7 +193,7 @@ function EventBind(parameters) {
         $('div#ResultBtn').hide();
         svg.selectAll("g#flag").remove();
 
-        //----------買賣價----------
+        //----------買賣價初始化----------
         bPrice = 0;
         sPrice_Man = 0;
         sPrice_Robot = 0;
@@ -213,7 +202,7 @@ function EventBind(parameters) {
         RobotIsSell = 'N';
         RobotIsFirst = 'N';
 
-        //----------統計量----------
+        //----------統計量初始化----------
         highestPrice = 0;
         lowestPrice = 9999;
         bsCount = 0;
@@ -235,6 +224,54 @@ function EventBind(parameters) {
             },
             1000);
     });
+}
+
+function RobotDrawFlag(parameters) {
+    var rectGroup = svg.append("g").attr("id", "Robotflag")
+        .selectAll("text").data(techKFullData).enter();
+
+    //線條
+    rectGroup.append('line').attr('x1', bsLineXCoordinate).attr('y1', 0).attr('x2', bsLineXCoordinate).attr('y2', 150)
+        .style('stroke', 'white').style('stroke-width', 1);
+    //文字框
+    rectGroup.append("rect")
+        .attr("x", bsLineXCoordinate - 49.5) //朝左
+        .attr("y",135)
+        .attr("width", '50px')
+        .attr("height", '15px')
+        .attr("fill", 'white')
+        .attr("class",
+            function (d) {
+                if (d.point !== undefined) {
+                    if (d.point.type === 'rise') {
+                        return "rect_rise";
+                    } else {
+                        return "rect_fall";
+                    }
+                } else {
+                    return 'none';
+                }
+            });
+
+    //文字
+    rectGroup.append("text")
+        .attr("x", bsLineXCoordinate - 25) //朝左
+        .attr("y", 145)
+        .attr("text-anchor", "middle")
+        .text(function (d) {
+            return '移動鎖利: ' + techKFullData[techKCount].close;
+        })
+        .style('fill', '#000')
+        .attr("class",
+            function (d) {
+                if (d.point !== undefined) {
+                    if (d.point.type === 'rise') {
+                        return "rect_txt_rise";
+                    } else {
+                        return "rect_txt_fall";
+                    }
+                }
+            });
 }
 
 function DrawFlag(parameters) {
@@ -478,7 +515,6 @@ function draw(data, RSIData, VolumeData) {
     ma20 = techan.indicator.sma().period(20)(data.slice(0, 158));
     ma60 = techan.indicator.sma().period(60)(data.slice(0, 158));
     defaultCandlestick = data.slice(59, 158);
-    //CompareHighLow(defaultCandlestick);
     xScale.range([0, width].map(d => d));
     bsLineXCoordinate = xScale(data[158].date);
 
@@ -552,7 +588,6 @@ function draw(data, RSIData, VolumeData) {
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
 
-    //$('span#High').html(highestPrice);
     $('span#Low').html(lowestPrice);
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
@@ -577,63 +612,57 @@ function GetYMD(parameters) {
     return year + '/' + month + '/' + date;
 }
 
-//function CompareHighLow(parameters) {
-//    $(parameters).each(function (idx, el) {
-//        if (el.close > highestPrice) {
-//            highestPrice = el.close;
-//        }
-
-//        if (el.close < lowestPrice) {
-//            lowestPrice = el.close;
-//        }
-//    });
-
-//    sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
-//    $('span#TrigPrice_Robot').html(sPrice_Robot);//觸發出場價
-//}
-
 function redraw(data, RSIData, VolumeData) {
     var ma20, ma60;
     var dataYCorrect = $.extend([], [], data.slice(59, techKCount), yAxisCorrect);
     var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
 
     if (bsCount > 0 && techKCount < 219) {
-        //價格計算
+        //----------更新最高價&移動鎖利出場價----------
         if (data[techKCount].high > highestPrice) {
             highestPrice = data[techKCount].high;
             sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
             $('span#TrigPrice_Robot').html(sPrice_Robot);
-        } else if (data[techKCount].low <= lowestPrice) {
+        }
+        //----------更新最低價----------
+        else if (data[techKCount].low <= lowestPrice) {
             lowestPrice = data[techKCount].low;
             $('span#Low').html(lowestPrice);
-
-            if (data[techKCount].high <= sPrice_Robot && RobotIsSell === 'N') {
-                alert("機器人賣出" + sPrice_Robot);
-                sPrice_Robot = data[techKCount].high;
-                spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
-                RobotIsSell = 'Y';
-
-                if (bsCount !== 2) {
-                    RobotIsFirst = 'Y';
-                }
-            }
         }
-        if (RobotIsSell === 'N' && techKCount === 218) {
-            sPrice_Robot = data[218].close;
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+
+        //----------觸發移動鎖利出場----------
+        if (data[techKCount].high <= sPrice_Robot && RobotIsSell === 'N') {
+            sPrice_Robot = data[techKCount].high;
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
+            RobotDrawFlag();
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
             }
         }
+
+        //----------最後一天移動鎖利強制出場----------
+        if (RobotIsSell === 'N' && techKCount === 218) {
+            sPrice_Robot = data[218].close;
+            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
+            RobotIsSell = 'Y';
+            RobotDrawFlag();
+
+            if (bsCount !== 2) {
+                RobotIsFirst = 'Y';
+            }
+        }
+        //----------最後一天客戶強制出場----------
         if (bsCount === 1 && techKCount === 218) {
             sPrice_Man = data[218].close;
             $('span#SPrice').html(sPrice_Man);
             spread_Man = (sPrice_Man - bPrice).toFixed(2);
         }
-    } else if (techKCount === 219) {
+    }
+    //---------勝負結算----------
+    else if (techKCount === 219) {
         var robot = ((spread_Robot / bPrice) * 100).toFixed(2);
         var man = ((spread_Man / bPrice) * 100).toFixed(2);
         var resultMsg = '本次交易損益:';
