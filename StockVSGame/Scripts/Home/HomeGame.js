@@ -254,7 +254,7 @@ function RobotDrawFlag(XCoordinate) {
         .attr("y", 145)
         .attr("text-anchor", "middle")
         .text(function (d) {
-            return '移動鎖利: ' + techKFullData[techKCount + 1].close;
+            return '移動鎖利: ' + sPrice_Robot;
         })
         .style('fill', '#000')
         .attr("class",
@@ -277,7 +277,7 @@ function DrawFlag(parameters) {
         { rect: bsLineXCoordinate - 0.5, text: bsLineXCoordinate + 25, color: 'green', bs: '賣出' }
     ];
 
-    //買進時先預設買進價為最高價
+    //買進當天取收盤價當作買進價
     if (bsCount === 0) {
         bPrice = techKFullData[techKCount].close;
         highestPrice = bPrice;
@@ -616,23 +616,40 @@ function redraw(data, RSIData, VolumeData) {
 
     if (bsCount > 0 && techKCount < 219) {
         //----------更新最高價&移動鎖利出場價----------
-        if (data[techKCount].high > highestPrice) {
+        if (parseFloat(data[techKCount].high) > parseFloat(highestPrice)) {
             highestPrice = data[techKCount].high;
             sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
             $('span#TrigPrice_Robot').html(sPrice_Robot);
+            $('span#High').html(highestPrice);
         }
         //----------更新最低價----------
-        else if (data[techKCount].low <= lowestPrice) {
+        else if (parseFloat(data[techKCount].low) <= parseFloat(lowestPrice)) {
             lowestPrice = data[techKCount].low;
             $('span#Low').html(lowestPrice);
         }
 
         //----------觸發移動鎖利出場----------
-        if (data[techKCount].high <= sPrice_Robot && RobotIsSell === 'N') {
-            sPrice_Robot = data[techKCount].high;
+        if (parseFloat(data[techKCount].open) <= parseFloat(sPrice_Robot) && RobotIsSell === 'N') {
+            sPrice_Robot = data[techKCount].open;
+            $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag(xScale(data[techKCount].date));
+            RobotDrawFlag(xScale(data[techKCount + 1].date));
+
+            if (bsCount !== 2) {
+                RobotIsFirst = 'Y';
+            }
+        } else if (parseFloat(data[techKCount].high) <= parseFloat(sPrice_Robot) && RobotIsSell === 'N') {
+            sPrice_Robot = (sPrice_Robot % 1 === 0)
+                ? sPrice_Robot - 0.5
+                : (sPrice_Robot - Math.floor(sPrice_Robot)) > 0.5
+                ? Math.floor(sPrice_Robot) + 0.5
+                    : Math.floor(sPrice_Robot);
+
+            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
+            RobotIsSell = 'Y';
+            RobotDrawFlag(xScale(data[techKCount + 1].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
@@ -669,7 +686,7 @@ function redraw(data, RSIData, VolumeData) {
         $('div#Result #Man').html(man + '%');
         $('div#Result #Robot').html(robot + '%');
         $('div#Chart').html($('div#CandlestickChart').prop("outerHTML"));
-        if (man >= robot) {
+        if (parseFloat(man) >= parseFloat(robot)) {
             $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youwin.png');
         } else {
             $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youlose.png');
