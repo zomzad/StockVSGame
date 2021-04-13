@@ -62,21 +62,19 @@
         <tr class="" align="center">
             <td>
                 <div class="row col-10 no-gutters" align="left">
-                    <div class="col-12 text-white">
+                    <div class="col-8 text-white ft1">
                         <div>本次交易損益 :</div>
                         <div id="Man" class="text-warning">***%</div>
-                    </div>
-                    <div class="col-12 text-white">
                         <div>透過移動鎖利損益 :</div>
                         <div id="Robot" class="text-warning">***%</div>
+                    </div>
+                    <div class="col-4 align-self-end">
+                        <img id="Winlose" src="~/Content/img/youwin.png" class="img-fluid">
                     </div>
                     <div class="col-12 text-white">
                         <div>評語 :</div>
                         <span id="Comments"></span>
                     </div>
-                </div>
-                <div class="col-12">
-                    <img id="Winlose" src="~/Content/img/youwin.png" style="width:40vW;">
                 </div>
                 <div class="col-12">
                     <div id="Chart"></div>
@@ -90,7 +88,7 @@
                     <a href="#" class="col">
                         <img id="FightAgainBtn" src="~/Content/img/bt_fightingagain.svg" class="img-fluid">
                     </a>
-                    <a href="#" class="col">
+                    <a href="#" class="col" data-toggle="modal" data-target="#QR_form">
                         <img id="LotteryBtn" src="~/Content/img/bt_lottery0.svg" class="img-fluid">
                     </a>
                 </div>
@@ -169,10 +167,10 @@
                         <img id="StartBtn" src="~/Content/img/bt_play0.svg" class="img-fluid">
                     </a>
                     <a href="#" class="col">
-                        <img id="BuyBtn" src="~/Content/img/bt_buy0.svg" class="img-fluid">
+                        <img id="BuyBtn" src="~/Content/img/bt_buyN.svg" class="img-fluid">
                     </a>
                     <a href="#" class="col">
-                        <img id="SellBtn" src="~/Content/img/bt_sell0.svg" class="img-fluid">
+                        <img id="SellBtn" src="~/Content/img/bt_sellN.svg" class="img-fluid">
                     </a>
                 </div>
             </td>
@@ -182,6 +180,26 @@
             <td background="~/Content/img/bg_04.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="pt-0">&nbsp;&nbsp;<br>&nbsp;&nbsp;</td>
         </tr>
     </table>
+
+    <!-- Modal -->
+    <div class="modal fade" id="QR_form" tabindex="-1" role="dialog" aria-labelledby="QR_formLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header bg-danger">
+                    <h5 class="modal-title text-white" id="QR_formLabel">手機掃碼來抽獎</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <img src="~/Content/img/QR_form.png" class="img-fluid">
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-block btn-link" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 </body>
 </html>

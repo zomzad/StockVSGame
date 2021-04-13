@@ -13,6 +13,7 @@ var RobotIsSell = 'N';
 var RobotIsFirst = 'N';
 
 //----------統計量----------
+var gameIsStart = false;
 var exeIndex = 0;
 var highestPrice = 0;
 var lowestPrice = 9999;
@@ -148,10 +149,22 @@ $(document).ready(function () {
 
 function EventBind(parameters) {
     $('#StartBtn').click(function () {
-        if (techKCount < 219) {
-            if ((interval === undefined || interval === null) && $('#StartBtn', $('div#Play')).attr('src').indexOf('bt_play0') >= 0) {
+        gameIsStart = true;
+
+        if (techKCount < 219 && bsCount < 2) {
+            switch (bsCount) {
+                case 0:
+                    $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buy0.svg');
+                    $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
+                    break;
+                case 1:
+                    $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
+                    break;
+            }
+
+            if (interval === undefined || interval === null) {
                 $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_pause1.svg');
-                interval = setInterval(function () {
+                interval = setInterval(function() {
                         if (techKCount < techKFullData.length) {
                             techKCount++;
                             redraw(techKFullData, rsiFullData, volumeFullData);
@@ -161,23 +174,28 @@ function EventBind(parameters) {
                     },
                     1000);
             } else {
-                if (bsCount < 2) {
-                    $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play0.svg');
-                    clearInterval(interval);
-                    interval = null;
-                }
+                $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play_goon.svg');
+
+                clearInterval(interval);
+                interval = null;
             }
         }
     });
 
     $('#BuyBtn').click(function () {
-        if (bsCount < 2 && bsCount !== 1 && interval !== null && interval !== undefined) {
+        if (gameIsStart && bsCount < 2 && bsCount !== 1) {
+            $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buyN.svg');
+            if (interval === undefined || interval === null) {
+                $('#StartBtn').click();
+            }
             DrawFlag();
         }
     });
 
     $('#SellBtn').click(function () {
-        if (bsCount < 2 && bsCount > 0 && interval !== null) {
+        if (gameIsStart && bsCount < 2 && bsCount > 0) {
+            $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_pause1.svg');
+            $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sellN.svg');
             DrawFlag();
         }
     });
@@ -589,7 +607,7 @@ function draw(data, RSIData, VolumeData) {
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
-    $('span#NowDT').html(GetYMD(data[99].date));
+    $('span#NowDT').html(GetYMD(data[158].date));
     $('span#RSI').html(rsiData[99].rsi.toFixed(2));
 }
 
@@ -809,14 +827,14 @@ function redraw(data, RSIData, VolumeData) {
     svgVolume.selectAll("g.x.axis").call(xAxisVol);
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
-
+    
     $('span#High').html(highestPrice);
     $('span#Low').html(lowestPrice);
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
-    $('span#NowDT').html(GetYMD(data[99].date));
-    $('span#RSI').html(rsiData[99].rsi.toFixed(2));
+    $('span#NowDT').html(GetYMD(data[techKCount].date));
+    $('span#RSI').html(rsiData[techKCount-59].rsi.toFixed(2));
 }
 
 function DisplayInfo(parameters) {
