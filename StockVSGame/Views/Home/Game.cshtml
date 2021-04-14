@@ -43,6 +43,10 @@
             overflow-x: hidden;
             overflow-y: auto;
         }
+        .ft1 {
+            font-size: 4vw;
+            line-height: 2;
+        }
     </style>
 </head>
 <body>
@@ -55,7 +59,10 @@
             <td>
                 <div class="pb-0 mb-0">
                     <div class="row col-10 no-gutters px-0" align="center">
-                        <img src="~/Content/img/banner.svg" style="width:80vW;"></div>
+                        <a href="https://vmjsmarket.jihsun.com.tw/StockVSRobot/">
+                            <img src="~/Content/img/banner.svg" style="width:80vW;">
+                        </a>
+                    </div>
                 </div>
             </td>
         </tr>
@@ -71,7 +78,7 @@
                     <div class="col-4 align-self-end">
                         <img id="Winlose" src="~/Content/img/youwin.png" class="img-fluid">
                     </div>
-                    <div class="col-12 text-white">
+                    <div class="col-12 text-white ft1">
                         <div>評語 :</div>
                         <span id="Comments"></span>
                     </div>
@@ -106,7 +113,9 @@
             <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
                 <div class="pb-0 mb-0">
                     <div class="row col-10 no-gutters px-0" align="center">
-                        <img src="~/Content/img/banner.svg" style="width:80vW;">
+                        <a href="https://vmjsmarket.jihsun.com.tw/StockVSRobot/">
+                            <img src="~/Content/img/banner.svg" style="width:80vW;">
+                        </a>
                     </div>
                 </div>
             </td>
@@ -121,13 +130,37 @@
                         <div class="text-danger">買進價:<span id="BPrice"></span></div>
                     </div>
                     <div class="col-4 text-white">
-                        <div>起始日: <span id="SDT">0</span></div>
+                        @if (Model.OnOff == "O")
+                        {
+                            <div>
+                                資訊遮罩
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                起始日: <span id="SDT">0</span>
+                            </div>
+                        }
+
                         <div class="text-warning">20MA: <span id="MAMonth">0</span></div>
                         <div class="text-info">60MA: <span id="MASeason">0</span></div>
                         <div class="text-success">賣出價:<span id="SPrice"></span></div>
                     </div>
                     <div class="col-4 text-white">
-                        <div>現在: <span id="NowDT">0</span></div>
+                        @if (Model.OnOff == "O")
+                        {
+                            <div>
+                                資訊遮罩
+                            </div>
+                        }
+                        else
+                        {
+                            <div>
+                                現在: <span id="NowDT">0</span>
+                            </div>
+                        }
+
                         <div>5日RSI值: <span id="RSI">61.67</span></div>
                         <div>移動鎖利停利: @Model.Percent%</div>
                         <div>移動鎖利價:<span id="TrigPrice_Robot"></span></div>

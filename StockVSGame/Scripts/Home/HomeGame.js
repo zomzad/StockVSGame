@@ -24,6 +24,7 @@ var techKFullData = null;
 var rsiFullData = null;
 var volumeFullData = null;
 var bsLineXCoordinate = 0;
+var voidDupArr = [];
 
 //----------K線圖----------
 var margin = { top: 20, right: 50, bottom: 30, left: 50 },
@@ -637,7 +638,7 @@ function redraw(data, RSIData, VolumeData) {
         if (parseFloat(data[techKCount].high) > parseFloat(highestPrice)) {
             highestPrice = data[techKCount].high;
             sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             $('span#High').html(highestPrice);
         }
         //----------更新最低價----------
@@ -649,7 +650,7 @@ function redraw(data, RSIData, VolumeData) {
         //----------觸發移動鎖利出場----------
         if (parseFloat(data[techKCount].open) <= parseFloat(sPrice_Robot) && RobotIsSell === 'N') {
             sPrice_Robot = data[techKCount].open;
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
             RobotDrawFlag(xScale(data[techKCount + 1].date));
@@ -664,7 +665,7 @@ function redraw(data, RSIData, VolumeData) {
                 ? Math.floor(sPrice_Robot) + 0.5
                     : Math.floor(sPrice_Robot);
 
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
             RobotDrawFlag(xScale(data[techKCount + 1].date));
