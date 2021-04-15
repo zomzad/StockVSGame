@@ -16,8 +16,15 @@
                 
                 
                 
+                
+                
+                
+                
+                
+                
+                
                 </MkTContent>
-  <OnOff>F</OnOff>
+  <OnOff>O</OnOff>
   <!--開:O 關:F-->
   <ActivityUrl>
   </ActivityUrl>
@@ -25,10 +32,10 @@
   <StockInfo>
     <STK 股票代號="2881" 起始日期="2020-03-10" 選擇="Y" />
     <STK 股票代號="3014" 起始日期="2020-03-10" 選擇="N" />
-    <STK 股票代號="2330" 起始日期="2021-01-15" 選擇="N" />
+    <STK 股票代號="2330" 起始日期="2015-01-15" 選擇="Y" />
     <STK 股票代號="3014" 起始日期="2020-03-10" 選擇="Y" />
     <STK 股票代號="0050" 起始日期="2021-03-30" 選擇="N" />
   </StockInfo>
-  <IsRadom>Y</IsRadom>
+  <IsRadom>N</IsRadom>
   <Percent>5</Percent>
 </Settings>

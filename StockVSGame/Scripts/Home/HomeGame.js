@@ -17,6 +17,8 @@ var gameIsStart = false;
 var exeIndex = 0;
 var highestPrice = 0;
 var lowestPrice = 9999;
+var viewhighestPrice = 0;
+var viewlowestPrice = 9999;
 var bsCount = 0;
 var techKCount = 59;
 var arrIndex = 100;
@@ -152,7 +154,7 @@ function EventBind(parameters) {
     $('#StartBtn').click(function () {
         gameIsStart = true;
 
-        if (techKCount < 219 && bsCount < 2) {
+        if (techKCount < 219) {
             switch (bsCount) {
                 case 0:
                     $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buy0.svg');
@@ -302,8 +304,8 @@ function DrawFlag(parameters) {
         highestPrice = bPrice;
         lowestPrice = bPrice;
         $('span#BPrice').html(bPrice);
-        $('span#High').html(bPrice);
-        $('span#Low').html(bPrice);
+        //$('span#High').html(bPrice);
+        //$('span#Low').html(bPrice);
 
         sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
         $('span#TrigPrice_Robot').html(sPrice_Robot);//移動鎖利出場價
@@ -382,14 +384,12 @@ function DrawFlag(parameters) {
 }
 
 function loadJSON(file, type) {
-    exeIndex = exeIndex < stockTotalNum ? exeIndex : 0;
-
     d3.json(file, function (error, data) {
         var accessor = candlestick.accessor();
         var jsonData = data["Data"][exeIndex];
         var accessorRSI = rsi.accessor();
         var accessorVol = volume.accessor();
-
+        
         data = jsonData.map(function (d) {
             if (type === "date") {
                 return {
@@ -533,7 +533,16 @@ function draw(data, RSIData, VolumeData) {
     defaultCandlestick = data.slice(59, 158);
     xScale.range([0, width].map(d => d));
     bsLineXCoordinate = xScale(data[158].date);
-
+    
+    //區間最高最低價
+    $(data.slice(59, 158)).each(function(idx, el) {
+        if (el.high > viewhighestPrice) {
+            viewhighestPrice = el.close;
+        } else if (el.low <= viewlowestPrice){
+            viewlowestPrice = el.close;
+        }
+    });
+    
     $(ma20.slice(59, 158)).each(function (idx, el) {
         if (el.value < minMA) {
             minMA = el.value;
@@ -567,7 +576,7 @@ function draw(data, RSIData, VolumeData) {
     //----------K線&均線 設定Y軸範圍----------
     
     svg.selectAll("g.candlestick").datum(defaultCandlestick).call(candlestick);
-    svg.selectAll("g.x.axis").call(xAxis.ticks(7).tickFormat(d3.timeFormat("%m/%d")));
+    svg.selectAll("g.x.axis").call(xAxis.ticks(10).tickFormat(d3.timeFormat("%m/%d")));
     svg.selectAll("g#yaxisL").call(yAxis);
     svg.selectAll("g#yaxisR").call(yAxisR);
     svg.select("g.sma.ma-1").attr("clip-path", "url(#candlestickClip)")
@@ -591,7 +600,7 @@ function draw(data, RSIData, VolumeData) {
     yRSI.domain(techan.scale.plot.rsi(rsiData).domain());
     yRSIR.domain(techan.scale.plot.rsi(rsiData).domain());
     svgRSI.selectAll("g.rsi").datum(rsiData.slice(0, 99)).call(rsi);
-    svgRSI.selectAll("g.x.axis").call(xAxisRSI);
+    svgRSI.selectAll("g.x.axis").call(xAxisRSI.ticks(10).tickFormat(d3.timeFormat("%m/%d")));
     svgRSI.selectAll("g#yaxisL").call(yAxisRSI);
     svgRSI.selectAll("g#yaxisR").call(yAxisRSIR);
 
@@ -600,11 +609,12 @@ function draw(data, RSIData, VolumeData) {
     yVol.domain(techan.scale.plot.volume(VolumeData.slice(59, VolumeData.length - 1), volume.accessor().v).domain());
     yVolR.domain(techan.scale.plot.volume(VolumeData.slice(59, VolumeData.length - 1), volume.accessor().v).domain());
     svgVolume.selectAll("g.volume").datum(VolumeData.slice(59, 158)).call(volume);
-    svgVolume.selectAll("g.x.axis").call(xAxisVol);
+    svgVolume.selectAll("g.x.axis").call(xAxisVol.ticks(10).tickFormat(d3.timeFormat("%m/%d")));
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
 
-    $('span#Low').html(lowestPrice);
+    $('span#High').html(viewhighestPrice);
+    $('span#Low').html(viewlowestPrice);
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
@@ -627,6 +637,18 @@ function GetYMD(parameters) {
 
     return year + '/' + month + '/' + date;
 }
+
+//產生亂數
+function GetRandom(min, max) {
+    var num = Math.floor(Math.random() * (max - min + 1)) + min;
+
+    if (voidDupArr.indexOf(num) >= 0) {
+        GetRandom(min, max);
+    } else {
+        voidDupArr.push(num);
+        return num;
+    }
+};
 
 function redraw(data, RSIData, VolumeData) {
     var ma20, ma60;
@@ -699,6 +721,18 @@ function redraw(data, RSIData, VolumeData) {
         var robot = ((spread_Robot / bPrice) * 100).toFixed(2);
         var man = ((spread_Man / bPrice) * 100).toFixed(2);
         var resultMsg = '';
+        if (isRadom === 'Y') {
+            if (voidDupArr.length === parseInt(stockTotalNum)) {
+                voidDupArr = [];
+            }
+            exeIndex = GetRandom(0, stockTotalNum - 1);
+        } else {
+            if (exeIndex >= stockTotalNum - 1) {
+                exeIndex = 0;
+            } else {
+                exeIndex++;
+            }
+        }
 
         $('table tr', 'div#Play').hide();
         $('div#Result').show();
@@ -711,61 +745,32 @@ function redraw(data, RSIData, VolumeData) {
             $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youlose.png');
         }
         
-        exeIndex++;
-        
         if (bsCount === 0) {
             $('div#Result #Comments').html('找不到時機進場嗎?');
             return false;
         }
-
         if (robot > 0 && man > 0) {
-            if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man >= 15) {
+            if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0)) {//移動鎖利先出。客戶贏
                 $('div#Result #Comments').html(resultMsg + '您的操作習慣很能掌握大行情，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            } else if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot >= 15) {
+            } else if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0)) {//移動鎖利先出。客戶輸
                 $('div#Result #Comments').html(resultMsg + '您的操作習慣很能掌握大行情，不過獲利也要適時賣出唷,透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
 
-            if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man >= 15) {
+            if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0)) {//移動鎖利後出。客戶贏
                 $('div#Result #Comments').html(resultMsg + '太厲害了，不過太早決定出場也很容易錯失大行情唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            } else if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot >= 15) {
+            } else if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0)) {//移動鎖利後出。客戶輸
                 $('div#Result #Comments').html(resultMsg + '太棒了，不過太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
-
-            if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot < 15) {
-                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
-            }
-            if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man < 15) {
-                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
-            }
-            if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot < 15) {
-                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
-            }
-            if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man < 15) {
-                $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
-            }
         } else if (robot < 0 && man < 0) {
-            if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man < -15) {
+            if (RobotIsFirst === 'Y' && (Math.abs(spread_Man) - Math.abs(spread_Robot) > 0)) {//移動鎖利先出。客戶輸
                 $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            } else if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot < -15) {
-                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            }
-            if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man < -15) {
-                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            } else if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot < -15) {
-                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            }
-
-            if (RobotIsFirst === 'N' && (spread_Robot - spread_Man > 0) && robot >= 15) {
-                $('div#Result #Comments').html(resultMsg + '太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔~');
-            }
-            if (RobotIsFirst === 'N' && (spread_Man - spread_Robot > 0) && man >= -15) {
-                $('div#Result #Comments').html(resultMsg + '快快停損雖然可以降低虧損，但是也可能錯失股價上漲潛力唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
-            }
-            if (RobotIsFirst === 'Y' && (spread_Robot - spread_Man > 0) && robot >= 15) {
+            } else if (RobotIsFirst === 'Y' && (Math.abs(spread_Robot) - Math.abs(spread_Man) > 0)) {//移動鎖利先出。客戶贏
                 $('div#Result #Comments').html(resultMsg + '行情波動劇烈，你對於風控的處理很棒唷');
             }
-            if (RobotIsFirst === 'Y' && (spread_Man - spread_Robot > 0) && man >= -15) {
+            if (RobotIsFirst === 'N' && (Math.abs(spread_Man) - Math.abs(spread_Robot) > 0)) {//移動鎖利後出。客戶輸
                 $('div#Result #Comments').html(resultMsg + '擁抱操作部位忍受行情波動是贏家必備條件，不過損失太大時也要記得停損唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+            } else if (RobotIsFirst === 'N' && (Math.abs(spread_Robot) - Math.abs(spread_Man) > 0)) {//移動鎖利後出。客戶贏
+                $('div#Result #Comments').html(resultMsg + '太早決定出場很容易錯失大行情唷，可以再想想出場時機唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
             }
         } else {
             if (RobotIsFirst === 'Y' && robot >= 15 && man < -15) {
@@ -785,10 +790,29 @@ function redraw(data, RSIData, VolumeData) {
             }
         }
 
+        resultMsg = $('div#Result #Comments').html();
+        //---------通用評語----------
+        if (resultMsg === '') {
+            if (man >= robot) {
+                $('div#Result #Comments').html(resultMsg + '擁抱操作部位忍受行情波動是贏家必備條件，不過損失太大時也要記得停損唷');
+            } else {
+                $('div#Result #Comments').html(resultMsg + '適時的停損才能保全您的資金唷，透過日盛移動鎖利可以幫助您有更穩定的操作績效喔');
+            }
+        }
+
         clearInterval(interval);
         interval = null;
 
         return false;
+    }
+
+    //區間最高最低價
+    if (parseFloat(data[techKCount].high) > parseFloat(viewhighestPrice)) {
+        viewhighestPrice = data[techKCount].high;
+        $('span#High').html(viewhighestPrice);
+    } else if (parseFloat(data[techKCount].low) <= parseFloat(viewlowestPrice)) {
+        viewlowestPrice = data[techKCount].low;
+        $('span#Low').html(viewlowestPrice);
     }
 
     //K線&均線
@@ -828,9 +852,7 @@ function redraw(data, RSIData, VolumeData) {
     svgVolume.selectAll("g.x.axis").call(xAxisVol);
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
-    
-    $('span#High').html(highestPrice);
-    $('span#Low').html(lowestPrice);
+
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
