@@ -531,14 +531,14 @@ function draw(data, RSIData, VolumeData) {
     //K線&均線
     x.domain(data.slice(59, 218).map(candlestick.accessor().d));
     xScale.domain(VolumeData.slice(59, VolumeData.length - 1).map(function (d) { return d.date; }));
-    ma20 = techan.indicator.sma().period(20)(data.slice(0, 158));
-    ma60 = techan.indicator.sma().period(60)(data.slice(0, 158));
-    defaultCandlestick = data.slice(59, 158);
+    ma20 = techan.indicator.sma().period(20)(data.slice(0, 159));
+    ma60 = techan.indicator.sma().period(60)(data.slice(0, 159));
+    defaultCandlestick = data.slice(59, 159);
     xScale.range([0, width].map(d => d));
-    bsLineXCoordinate = xScale(data[158].date);
+    bsLineXCoordinate = xScale(data[159].date);
     
     //區間最高最低價
-    $(data.slice(59, 158)).each(function(idx, el) {
+    $(data.slice(59, 159)).each(function(idx, el) {
         if (el.high > viewhighestPrice) {
             viewhighestPrice = el.close;
         } else if (el.low <= viewlowestPrice){
@@ -546,7 +546,7 @@ function draw(data, RSIData, VolumeData) {
         }
     });
     
-    $(ma20.slice(59, 158)).each(function (idx, el) {
+    $(ma20.slice(59, 159)).each(function (idx, el) {
         if (el.value < minMA) {
             minMA = el.value;
         }
@@ -571,7 +571,7 @@ function draw(data, RSIData, VolumeData) {
     ];
 
     dataYCorrect = $.extend([], [],
-        data.slice(59, 158),
+        data.slice(59, 159),
         yAxisCorrect);
 
     y.domain(techan.scale.plot.ohlc(dataYCorrect, candlestick.accessor()).domain());
@@ -611,7 +611,7 @@ function draw(data, RSIData, VolumeData) {
     xVol.domain(VolumeData.slice(59, VolumeData.length - 1).map(volume.accessor().d));
     yVol.domain(techan.scale.plot.volume(VolumeData.slice(59, VolumeData.length - 1), volume.accessor().v).domain());
     yVolR.domain(techan.scale.plot.volume(VolumeData.slice(59, VolumeData.length - 1), volume.accessor().v).domain());
-    svgVolume.selectAll("g.volume").datum(VolumeData.slice(59, 158)).call(volume);
+    svgVolume.selectAll("g.volume").datum(VolumeData.slice(59, 159)).call(volume);
     svgVolume.selectAll("g.x.axis").call(xAxisVol.ticks(10).tickFormat(d3.timeFormat("%m/%d")));
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
@@ -621,7 +621,7 @@ function draw(data, RSIData, VolumeData) {
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
-    $('span#NowDT').html(GetYMD(data[158].date));
+    $('span#NowDT').html(GetYMD(data[159].date));
     $('span#RSI').html(rsiData[99].rsi.toFixed(2));
 }
 

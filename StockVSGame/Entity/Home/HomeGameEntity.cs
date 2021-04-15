@@ -49,7 +49,28 @@ namespace StockVSGame.Entity.Home
             DataTable tableRow = new DataTable();
             foreach (var row in stockIDList)
             {
-                var dt = DateTime.ParseExact(row.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddDays(-160).ToString("yyyyMMdd");
+
+                var commandTextDate = new StringBuilder(string.Join(Environment.NewLine, new object[]
+                {
+                    "SELECT TOP 160 日期",
+                    "FROM 日收盤表排行",
+                    "WHERE 股票代號 = '" + row.StockID + "' AND 日期 <= '" + row.Date + "'",
+                    "ORDER BY 日期 DESC",
+                }));
+                using (SqlConnection connection = new SqlConnection(_conn))
+                {
+                    using (SqlCommand cmd = new SqlCommand(commandTextDate.ToString(), connection))
+                    {
+                        connection.Open();
+                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                        adapter.Fill(tableRow);
+                    }
+                }
+
+                var taDate = tableRow.ToList<Stock>().ToList()[159].日期;
+                tableRow = new DataTable();
+
+                //var dt = DateTime.ParseExact(row.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddDays(-160).ToString("yyyyMMdd");
                 var commandText = new StringBuilder(string.Join(Environment.NewLine, new object[]
                 {
                     "SELECT TOP 220 日期",
@@ -76,8 +97,8 @@ namespace StockVSGame.Entity.Home
                     "     , '18.98' AS DIB",
                     "     , '19.69' AS ADX",
                     "  FROM 日收盤表排行",
-                    " WHERE 股票代號 = '"+ row.StockID +"' AND 日期 >= '"+ dt +"'",
-                    " ORDER BY 日期 DESC"
+                    " WHERE 股票代號 = '"+ row.StockID +"' AND 日期 > '"+ taDate +"'",
+                    " ORDER BY 日期 ASC"
                 }));
 
                 using (SqlConnection connection = new SqlConnection(_conn))
