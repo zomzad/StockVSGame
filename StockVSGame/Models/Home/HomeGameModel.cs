@@ -67,7 +67,6 @@ namespace StockVSGame
 
                 if (stockList.Any())
                 {
-                    StockTotalNum = stockList.Count.ToString();
                     MaCount(new List<int> { 20, 60 }, stockList[0]);//計算月線&季線
 
                     //轉換資料格式適合data.json使用
@@ -176,6 +175,8 @@ namespace StockVSGame
                         //Date = "2020-07-16"
                     };
                 }).ToList());
+
+            StockTotalNum = StockInfoList.Count.ToString();
         }
     }
 }
