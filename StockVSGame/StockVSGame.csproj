@@ -120,6 +120,7 @@
     <Content Include="Content\img\bt_play0.svg" />
     <Content Include="Content\img\bt_play1.png" />
     <Content Include="Content\img\bt_play1.svg" />
+    <Content Include="Content\img\bt_play_goon.svg" />
     <Content Include="Content\img\bt_sell0.png" />
     <Content Include="Content\img\bt_sell0.svg" />
     <Content Include="Content\img\bt_sell1.png" />
@@ -130,6 +131,7 @@
     <Content Include="Content\img\chart3.png" />
     <Content Include="Content\img\eDM_form_top.jpg" />
     <Content Include="Content\img\LOGO.png" />
+    <Content Include="Content\img\QR_form.png" />
     <Content Include="Content\img\youlose.png" />
     <Content Include="Content\img\youwin.png" />
     <Content Include="Global.asax" />
@@ -167,8 +169,8 @@
     <Content Include="Scripts\rsi.json" />
     <Content Include="Views\Admin\Index.cshtml" />
     <Content Include="Views\Home\IndexB.cshtml" />
-    <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
     <Content Include="Views\Home\Game.cshtml" />
+    <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Web.Debug.config">
       <DependentUpon>Web.config</DependentUpon>
     </None>

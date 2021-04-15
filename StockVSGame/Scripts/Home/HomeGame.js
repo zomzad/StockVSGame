@@ -1,4 +1,4 @@
-﻿var serverPath = window.location.host.indexOf('localhost') >= 0 ? '' : '/StockVSRobot';
+﻿var serverPath = window.location.host.indexOf('localhost') >= 0 ? '' : '';
 var svg, svgVolume, svgRSI;
 var interval;
 var yAxisCorrect;
@@ -13,6 +13,7 @@ var RobotIsSell = 'N';
 var RobotIsFirst = 'N';
 
 //----------統計量----------
+var gameIsStart = false;
 var exeIndex = 0;
 var highestPrice = 0;
 var lowestPrice = 9999;
@@ -23,11 +24,12 @@ var techKFullData = null;
 var rsiFullData = null;
 var volumeFullData = null;
 var bsLineXCoordinate = 0;
+var voidDupArr = [];
 
 //----------K線圖----------
 var margin = { top: 20, right: 50, bottom: 30, left: 50 },
     width = 580 - margin.left - margin.right,
-    height = 200 - margin.top - margin.bottom;
+    height = 230 - margin.top - margin.bottom;
 var xScale = d3.scaleBand().range([0, width]).padding(0.15);
 var parseDate = d3.timeParse("%Y%m%d");
 var monthDate = d3.timeParse("%Y%m");
@@ -54,9 +56,9 @@ var yAxisR = d3.axisRight()
     .scale(yR);
 
 //----------RSI----------
-var marginRSI = { top: 20, right: 48, bottom: 25, left: 50 },
+var marginRSI = { top: 5, right: 48, bottom: 25, left: 50 },
     widthRSI = 550 - marginRSI.left - marginRSI.right,
-    heightRSI = 150 - marginRSI.top - marginRSI.bottom;
+    heightRSI = 120 - marginRSI.top - marginRSI.bottom;
 var xRSI = techan.scale.financetime()
     .range([0, widthRSI]);
 var yRSI = d3.scaleLinear()
@@ -73,7 +75,7 @@ var rsi = techan.plot.rsi()
     .yScale(yRSI);
 
 //----------volume----------
-var marginVol = { top: 5, right: 50, bottom: 30, left: 50 },
+var marginVol = { top: 5, right: 50, bottom: 16, left: 50 },
     widthVol = 550 - marginVol.left - marginVol.right,
     heightVol = 120 - marginVol.top - marginVol.bottom;
 var xVol = techan.scale.financetime()
@@ -127,7 +129,7 @@ $(document).ready(function () {
     svg = d3.select("div#CandlestickChart")
         .append("svg")
         .attr("preserveAspectRatio", "xMidYMid")
-        .attr("viewBox", "0 0 580 200")
+        .attr("viewBox", "0 0 580 230")
         .attr("pointer-events", "all")
         .append("g")
         .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
@@ -148,10 +150,22 @@ $(document).ready(function () {
 
 function EventBind(parameters) {
     $('#StartBtn').click(function () {
-        if (techKCount < 219) {
-            if ((interval === undefined || interval === null) && $('#StartBtn', $('div#Play')).attr('src').indexOf('bt_play0') >= 0) {
+        gameIsStart = true;
+
+        if (techKCount < 219 && bsCount < 2) {
+            switch (bsCount) {
+                case 0:
+                    $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buy0.svg');
+                    $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
+                    break;
+                case 1:
+                    $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
+                    break;
+            }
+
+            if (interval === undefined || interval === null) {
                 $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_pause1.svg');
-                interval = setInterval(function () {
+                interval = setInterval(function() {
                         if (techKCount < techKFullData.length) {
                             techKCount++;
                             redraw(techKFullData, rsiFullData, volumeFullData);
@@ -161,23 +175,28 @@ function EventBind(parameters) {
                     },
                     1000);
             } else {
-                if (bsCount < 2) {
-                    $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play0.svg');
-                    clearInterval(interval);
-                    interval = null;
-                }
+                $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play_goon.svg');
+
+                clearInterval(interval);
+                interval = null;
             }
         }
     });
 
     $('#BuyBtn').click(function () {
-        if (bsCount < 2 && bsCount !== 1 && interval !== null && interval !== undefined) {
+        if (gameIsStart && bsCount < 2 && bsCount !== 1) {
+            $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buyN.svg');
+            if (interval === undefined || interval === null) {
+                $('#StartBtn').click();
+            }
             DrawFlag();
         }
     });
 
     $('#SellBtn').click(function () {
-        if (bsCount < 2 && bsCount > 0 && interval !== null) {
+        if (gameIsStart && bsCount < 2 && bsCount > 0) {
+            $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_pause1.svg');
+            $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sellN.svg');
             DrawFlag();
         }
     });
@@ -226,12 +245,12 @@ function RobotDrawFlag(XCoordinate) {
         .selectAll("text").data(techKFullData).enter();
 
     //線條
-    rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 150)
+    rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 180)
         .style('stroke', 'white').style('stroke-width', 1);
     //文字框
     rectGroup.append("rect")
         .attr("x", XCoordinate - 49.5) //朝左
-        .attr("y",135)
+        .attr("y",165)
         .attr("width", '50px')
         .attr("height", '15px')
         .attr("fill", 'white')
@@ -251,7 +270,7 @@ function RobotDrawFlag(XCoordinate) {
     //文字
     rectGroup.append("text")
         .attr("x", XCoordinate - 25) //朝左
-        .attr("y", 145)
+        .attr("y", 175)
         .attr("text-anchor", "middle")
         .text(function (d) {
             return '移動鎖利: ' + sPrice_Robot;
@@ -312,7 +331,7 @@ function DrawFlag(parameters) {
     }
 
     //線條
-    rectGroup.append('line').attr('x1', bsLineXCoordinate).attr('y1', 10).attr('x2', bsLineXCoordinate).attr('y2', 150)
+    rectGroup.append('line').attr('x1', bsLineXCoordinate).attr('y1', 10).attr('x2', bsLineXCoordinate).attr('y2', 180)
         .style('stroke', bsLineStyle[bsCount].color).style('stroke-width', 1);
     //文字框
     rectGroup.append("rect")
@@ -589,7 +608,7 @@ function draw(data, RSIData, VolumeData) {
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
-    $('span#NowDT').html(GetYMD(data[99].date));
+    $('span#NowDT').html(GetYMD(data[158].date));
     $('span#RSI').html(rsiData[99].rsi.toFixed(2));
 }
 
@@ -619,7 +638,7 @@ function redraw(data, RSIData, VolumeData) {
         if (parseFloat(data[techKCount].high) > parseFloat(highestPrice)) {
             highestPrice = data[techKCount].high;
             sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             $('span#High').html(highestPrice);
         }
         //----------更新最低價----------
@@ -631,7 +650,7 @@ function redraw(data, RSIData, VolumeData) {
         //----------觸發移動鎖利出場----------
         if (parseFloat(data[techKCount].open) <= parseFloat(sPrice_Robot) && RobotIsSell === 'N') {
             sPrice_Robot = data[techKCount].open;
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
             RobotDrawFlag(xScale(data[techKCount + 1].date));
@@ -646,7 +665,7 @@ function redraw(data, RSIData, VolumeData) {
                 ? Math.floor(sPrice_Robot) + 0.5
                     : Math.floor(sPrice_Robot);
 
-            $('span#TrigPrice_Robot').html(sPrice_Robot);
+            if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
             RobotDrawFlag(xScale(data[techKCount + 1].date));
@@ -809,14 +828,14 @@ function redraw(data, RSIData, VolumeData) {
     svgVolume.selectAll("g.x.axis").call(xAxisVol);
     svgVolume.selectAll("g#yaxisL").call(yAxisVol);
     svgVolume.selectAll("g#yaxisR").call(yAxisVolR);
-
+    
     $('span#High').html(highestPrice);
     $('span#Low').html(lowestPrice);
     $('span#MAMonth').html(ma20[ma20.length - 1].value.toFixed(2));
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
-    $('span#NowDT').html(GetYMD(data[99].date));
-    $('span#RSI').html(rsiData[99].rsi.toFixed(2));
+    $('span#NowDT').html(GetYMD(data[techKCount].date));
+    $('span#RSI').html(rsiData[techKCount-59].rsi.toFixed(2));
 }
 
 function DisplayInfo(parameters) {
