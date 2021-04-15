@@ -153,6 +153,7 @@ $(document).ready(function () {
 function EventBind(parameters) {
     $('#StartBtn').click(function () {
         gameIsStart = true;
+        var intervalNum = bsCount === 2 ? 200 : 1000;
 
         if (techKCount < 219) {
             switch (bsCount) {
@@ -175,7 +176,7 @@ function EventBind(parameters) {
                             clearInterval(interval);
                         }
                     },
-                    1000);
+                    intervalNum);
             } else {
                 $('#StartBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_play_goon.svg');
 
@@ -720,8 +721,8 @@ function redraw(data, RSIData, VolumeData) {
     }
     //---------勝負結算----------
     else if (techKCount === 219) {
-        var robot = ((spread_Robot / bPrice) * 100).toFixed(2);
-        var man = ((spread_Man / bPrice) * 100).toFixed(2);
+        var robot = bsCount === 0 ? '0' : ((spread_Robot / bPrice) * 100).toFixed(2);
+        var man = bsCount === 0 ? '0' : ((spread_Man / bPrice) * 100).toFixed(2);
         var resultMsg = '';
         if (isRadom === 'Y') {
             if (voidDupArr.length === parseInt(stockTotalNum)) {
@@ -741,6 +742,9 @@ function redraw(data, RSIData, VolumeData) {
         $('div#Result #Man').html(man + '%');
         $('div#Result #Robot').html(robot + '%');
         $('div#Chart').html($('div#CandlestickChart').prop("outerHTML"));
+        $('span#TrigPrice_Robot').html('');
+        $('span#BPrice').html('');
+        $('span#SPrice').html('');
         if (parseFloat(man) >= parseFloat(robot)) {
             $('#Winlose', $('div#Result')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/youwin.png');
         } else {
