@@ -705,7 +705,7 @@ function redraw(data, RSIData, VolumeData) {
             $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag(xScale(data[techKCount].date));
+            RobotDrawFlag(xScale(data[218].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
