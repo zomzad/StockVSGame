@@ -246,6 +246,7 @@ function EventBind(parameters) {
 function RobotDrawFlag(XCoordinate) {
     var rectGroup = svg.append("g").attr("id", "Robotflag")
         .selectAll("text").data(techKFullData).enter();
+    var flagTxt = techKCount === 218 ? '結算出場' : '移動鎖利'
 
     //線條
     rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 180)
@@ -276,7 +277,7 @@ function RobotDrawFlag(XCoordinate) {
         .attr("y", 175)
         .attr("text-anchor", "middle")
         .text(function (d) {
-            return '移動鎖利: ' + sPrice_Robot;
+            return flagTxt + ': ' + sPrice_Robot;
         })
         .style('fill', '#000')
         .style('font-size', '1vh')
