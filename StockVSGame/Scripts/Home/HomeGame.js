@@ -1,4 +1,4 @@
-﻿var serverPath = window.location.host.indexOf('vmjsmarket') >= 0 ? 'StockVSRobot' : '';
+﻿var serverPath = window.location.host.indexOf('vmjsmarket') >= 0 ? '/StockVSRobot' : '';
 var svg, svgVolume, svgRSI;
 var interval;
 var yAxisCorrect;

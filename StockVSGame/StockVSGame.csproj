@@ -168,7 +168,6 @@
     <Content Include="Scripts\data.json" />
     <Content Include="Scripts\rsi.json" />
     <Content Include="Views\Admin\Index.cshtml" />
-    <Content Include="Views\Home\IndexB.cshtml" />
     <Content Include="Views\Home\Game.cshtml" />
     <None Include="Properties\PublishProfiles\CustomProfile.pubxml" />
     <None Include="Properties\PublishProfiles\FolderProfile.pubxml" />
