@@ -1,4 +1,4 @@
-﻿var serverPath = window.location.host.indexOf('localhost') >= 0 ? '' : '';
+﻿var serverPath = window.location.host.indexOf('vmjsmarket') >= 0 ? 'StockVSRobot' : '';
 var svg, svgVolume, svgRSI;
 var interval;
 var yAxisCorrect;
@@ -306,9 +306,6 @@ function DrawFlag(parameters) {
         highestPrice = bPrice;
         lowestPrice = bPrice;
         $('span#BPrice').html(bPrice);
-        //$('span#High').html(bPrice);
-        //$('span#Low').html(bPrice);
-
         sPrice_Robot = (highestPrice - (highestPrice * (percent / 100))).toFixed(2);
         $('span#TrigPrice_Robot').html(sPrice_Robot);//移動鎖利出場價
         $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buyN.svg');
@@ -526,7 +523,7 @@ function draw(data, RSIData, VolumeData) {
     var ma20, ma60;
     var minMA = 9999;
     var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
-    techKCount = techKCount + 99;
+    techKCount = techKCount + 100;
     
     //K線&均線
     x.domain(data.slice(59, 218).map(candlestick.accessor().d));
