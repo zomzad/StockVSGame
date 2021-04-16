@@ -390,7 +390,8 @@ function loadJSON(file, type) {
         var jsonData = data["Data"][exeIndex];
         var accessorRSI = rsi.accessor();
         var accessorVol = volume.accessor();
-        
+
+        if (voidDupArr.length === 0) voidDupArr.push(exeIndex);
         data = jsonData.map(function (d) {
             if (type === "date") {
                 return {
@@ -644,7 +645,7 @@ function GetRandom(min, max) {
     var num = Math.floor(Math.random() * (max - min + 1)) + min;
 
     if (voidDupArr.indexOf(num) >= 0) {
-        GetRandom(min, max);
+        return GetRandom(min, max);
     } else {
         voidDupArr.push(num);
         return num;
@@ -655,7 +656,7 @@ function redraw(data, RSIData, VolumeData) {
     var ma20, ma60;
     var dataYCorrect = $.extend([], [], data.slice(59, techKCount), yAxisCorrect);
     var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
-    debugger;
+    
     if (bsCount > 0 && techKCount < 220) {
         //----------更新最高價&移動鎖利出場價----------
         if (parseFloat(data[techKCount].high) > parseFloat(highestPrice)) {
@@ -722,6 +723,7 @@ function redraw(data, RSIData, VolumeData) {
         var robot = bsCount === 0 ? '0' : ((spread_Robot / bPrice) * 100).toFixed(2);
         var man = bsCount === 0 ? '0' : ((spread_Man / bPrice) * 100).toFixed(2);
         var resultMsg = '';
+        
         if (isRadom === 'Y') {
             if (voidDupArr.length === parseInt(stockTotalNum)) {
                 voidDupArr = [];

@@ -47,73 +47,85 @@ namespace StockVSGame.Entity.Home
         {
             List<List<Stock>> stockInfoList = new List<List<Stock>>();
             DataTable tableRow = new DataTable();
-            foreach (var row in stockIDList)
+            try
+            {
+                foreach (var row in stockIDList)
+                {
+
+                    var commandTextDate = new StringBuilder(string.Join(Environment.NewLine, new object[]
+                    {
+                        "SELECT TOP 160 日期",
+                        "FROM 日收盤表排行",
+                        "WHERE 股票代號 = '" + row.StockID + "' AND 日期 <= '" + row.Date + "'",
+                        "ORDER BY 日期 DESC",
+                    }));
+                    using (SqlConnection connection = new SqlConnection(_conn))
+                    {
+                        using (SqlCommand cmd = new SqlCommand(commandTextDate.ToString(), connection))
+                        {
+                            connection.Open();
+                            SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                            adapter.Fill(tableRow);
+                        }
+                    }
+
+                    var dataList = tableRow.ToList<Stock>().ToList();
+                    if (dataList.Count == 160)
+                    {
+                        var taDate = tableRow.ToList<Stock>().ToList()[159].日期;
+                        tableRow = new DataTable();
+
+                        //var dt = DateTime.ParseExact(row.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddDays(-160).ToString("yyyyMMdd");
+                        var commandText = new StringBuilder(string.Join(Environment.NewLine, new object[]
+                        {
+                            "SELECT TOP 220 日期",
+                            "     , 股票代號",
+                            "     , 股票名稱",
+                            "     , 開盤價",
+                            "     , 最高價",
+                            "     , 最低價",
+                            "     , 收盤價",
+                            "     , 漲跌",
+                            "     , [漲幅(%)] AS 漲跌比例",
+                            "     , 成交量",
+                            "     , '0' AS 周均線",
+                            "     , '' AS 月均線",
+                            "     , '' AS 季均線",
+                            "     , '86.19' AS K",
+                            "     , '86.12' AS D",
+                            "     , '72.07' AS RSIA",
+                            "     , '67.24' AS RSIB",
+                            "     , '0.501' AS DIF",
+                            "     , '0.478' AS MACD",
+                            "     , '0.023' AS DMACD",
+                            "     , '27.29' AS DIA",
+                            "     , '18.98' AS DIB",
+                            "     , '19.69' AS ADX",
+                            "  FROM 日收盤表排行",
+                            " WHERE 股票代號 = '" + row.StockID + "' AND 日期 > '" + taDate + "'",
+                            " ORDER BY 日期 ASC"
+                        }));
+
+                        using (SqlConnection connection = new SqlConnection(_conn))
+                        {
+                            using (SqlCommand cmd = new SqlCommand(commandText.ToString(), connection))
+                            {
+                                connection.Open();
+                                SqlDataAdapter adapter = new SqlDataAdapter(cmd);
+                                adapter.Fill(tableRow);
+                            }
+                        }
+
+                        stockInfoList.Add(tableRow.ToList<Stock>().ToList());
+                        tableRow = new DataTable();
+                    }
+                }
+            }
+            catch (Exception ex)
             {
 
-                var commandTextDate = new StringBuilder(string.Join(Environment.NewLine, new object[]
-                {
-                    "SELECT TOP 160 日期",
-                    "FROM 日收盤表排行",
-                    "WHERE 股票代號 = '" + row.StockID + "' AND 日期 <= '" + row.Date + "'",
-                    "ORDER BY 日期 DESC",
-                }));
-                using (SqlConnection connection = new SqlConnection(_conn))
-                {
-                    using (SqlCommand cmd = new SqlCommand(commandTextDate.ToString(), connection))
-                    {
-                        connection.Open();
-                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                        adapter.Fill(tableRow);
-                    }
-                }
-
-                var taDate = tableRow.ToList<Stock>().ToList()[159].日期;
-                tableRow = new DataTable();
-
-                //var dt = DateTime.ParseExact(row.Date, "yyyy-MM-dd", CultureInfo.InvariantCulture).AddDays(-160).ToString("yyyyMMdd");
-                var commandText = new StringBuilder(string.Join(Environment.NewLine, new object[]
-                {
-                    "SELECT TOP 220 日期",
-                    "     , 股票代號",
-                    "     , 股票名稱",
-                    "     , 開盤價",
-                    "     , 最高價",
-                    "     , 最低價",
-                    "     , 收盤價",
-                    "     , 漲跌",
-                    "     , [漲幅(%)] AS 漲跌比例",
-                    "     , 成交量",
-                    "     , '0' AS 周均線",
-                    "     , '' AS 月均線",
-                    "     , '' AS 季均線",
-                    "     , '86.19' AS K",
-                    "     , '86.12' AS D",
-                    "     , '72.07' AS RSIA",
-                    "     , '67.24' AS RSIB",
-                    "     , '0.501' AS DIF",
-                    "     , '0.478' AS MACD",
-                    "     , '0.023' AS DMACD",
-                    "     , '27.29' AS DIA",
-                    "     , '18.98' AS DIB",
-                    "     , '19.69' AS ADX",
-                    "  FROM 日收盤表排行",
-                    " WHERE 股票代號 = '"+ row.StockID +"' AND 日期 > '"+ taDate +"'",
-                    " ORDER BY 日期 ASC"
-                }));
-
-                using (SqlConnection connection = new SqlConnection(_conn))
-                {
-                    using (SqlCommand cmd = new SqlCommand(commandText.ToString(), connection))
-                    {
-                        connection.Open();
-                        SqlDataAdapter adapter = new SqlDataAdapter(cmd);
-                        adapter.Fill(tableRow);
-                    }
-                }
-
-                stockInfoList.Add(tableRow.ToList<Stock>().ToList());
-                tableRow = new DataTable();
             }
+
 
             return stockInfoList;
         }
