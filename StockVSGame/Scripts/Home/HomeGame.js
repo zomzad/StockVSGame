@@ -872,7 +872,7 @@ function redraw(data, RSIData, VolumeData) {
     $('span#MASeason').html(ma60[ma60.length - 1].value.toFixed(2));
     $('span#SDT').html(GetYMD(data[59].date));
     $('span#NowDT').html(GetYMD(data[techKCount].date));
-    $('span#RSI').html(rsiData[techKCount-59].rsi.toFixed(2));
+    $('span#RSI').html(rsiData[techKCount-60].rsi.toFixed(2));
 }
 
 function DisplayInfo(parameters) {

@@ -64,7 +64,6 @@ namespace StockVSGame
             try
             {
                 List<List<Stock>> stockList = _entity.GetStockList(StockInfoList);
-                StockTotalNum = "15";
                 if (stockList.Any())
                 {
                     StockTotalNum = stockList.Count.ToString();
