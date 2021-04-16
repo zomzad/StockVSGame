@@ -677,7 +677,7 @@ function redraw(data, RSIData, VolumeData) {
             if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag(xScale(data[techKCount + 1].date));
+            RobotDrawFlag(xScale(data[techKCount].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
@@ -692,7 +692,7 @@ function redraw(data, RSIData, VolumeData) {
             if (RobotIsSell === 'N') $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
             RobotIsSell = 'Y';
-            RobotDrawFlag(xScale(data[techKCount + 1].date));
+            RobotDrawFlag(xScale(data[techKCount].date));
 
             if (bsCount !== 2) {
                 RobotIsFirst = 'Y';
