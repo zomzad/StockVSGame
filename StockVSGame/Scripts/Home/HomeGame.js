@@ -526,7 +526,7 @@ function draw(data, RSIData, VolumeData) {
     techKCount = techKCount + 100;
     
     //K線&均線
-    x.domain(data.slice(59, 218).map(candlestick.accessor().d));
+    x.domain(data.slice(59, 219).map(candlestick.accessor().d));
     xScale.domain(VolumeData.slice(59, VolumeData.length - 1).map(function (d) { return d.date; }));
     ma20 = techan.indicator.sma().period(20)(data.slice(0, 159));
     ma60 = techan.indicator.sma().period(60)(data.slice(0, 159));
@@ -654,8 +654,8 @@ function redraw(data, RSIData, VolumeData) {
     var ma20, ma60;
     var dataYCorrect = $.extend([], [], data.slice(59, techKCount), yAxisCorrect);
     var rsiData = techan.indicator.rsi()(RSIData.slice(45, RSIData.length - 1));
-
-    if (bsCount > 0 && techKCount < 219) {
+    debugger;
+    if (bsCount > 0 && techKCount < 220) {
         //----------更新最高價&移動鎖利出場價----------
         if (parseFloat(data[techKCount].high) > parseFloat(highestPrice)) {
             highestPrice = data[techKCount].high;
@@ -698,7 +698,7 @@ function redraw(data, RSIData, VolumeData) {
         }
 
         //----------最後一天移動鎖利強制出場----------
-        if (RobotIsSell === 'N' && techKCount === 218) {
+        if (RobotIsSell === 'N' && techKCount === 219) {
             sPrice_Robot = data[218].close;
             $('span#TrigPrice_Robot').html(sPrice_Robot);
             spread_Robot = (sPrice_Robot - bPrice).toFixed(2);
@@ -710,14 +710,14 @@ function redraw(data, RSIData, VolumeData) {
             }
         }
         //----------最後一天客戶強制出場----------
-        if (bsCount === 1 && techKCount === 218) {
+        if (bsCount === 1 && techKCount === 219) {
             sPrice_Man = data[218].close;
             $('span#SPrice').html(sPrice_Man);
             spread_Man = (sPrice_Man - bPrice).toFixed(2);
         }
     }
     //---------勝負結算----------
-    else if (techKCount === 219) {
+    else if (techKCount === 220) {
         var robot = bsCount === 0 ? '0' : ((spread_Robot / bPrice) * 100).toFixed(2);
         var man = bsCount === 0 ? '0' : ((spread_Man / bPrice) * 100).toFixed(2);
         var resultMsg = '';
