@@ -1,4 +1,7 @@
 ﻿@model HomeIndexModel
+@{
+    string path = "../" + Model.AddBackGroundPath + "Content/img/black-carbon.jpg";
+}
 <!DOCTYPE html>
 <html lang="zh-Hant-TW">
 <head>
@@ -22,7 +25,7 @@
     <style TYPE="text/css">
         body {
             font-size: 2vW;
-            background: url(../Content/img/black-carbon.jpg) repeat;
+            background: url(@Model.AddBackGroundPath) repeat;
         }
 
         .bg-carbon {

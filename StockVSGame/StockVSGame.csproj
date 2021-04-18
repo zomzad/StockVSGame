@@ -91,7 +91,13 @@
     <Content Include="App_Data\Setting.xml">
       <SubType>Designer</SubType>
     </Content>
+    <Content Include="Content\css\all.min.css" />
+    <Content Include="Content\css\bootstrap-switch-button.min.css" />
     <Content Include="Content\css\bootstrap.css" />
+    <Content Include="Content\css\bootstrap.min.css" />
+    <Content Include="Content\css\css.css" />
+    <Content Include="Content\css\fontawesome.min.css" />
+    <Content Include="Content\css\github.min.css" />
     <Content Include="Content\css\style.css" />
     <Content Include="Content\img\325x1080.png" />
     <Content Include="Content\img\385x1080.jpg" />

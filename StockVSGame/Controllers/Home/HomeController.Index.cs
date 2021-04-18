@@ -8,6 +8,7 @@ namespace StockVSGame.Controllers
         public ActionResult Index()
         {
             HomeIndexModel model = new HomeIndexModel();
+            model.Init();
 
             return View(model);
         }

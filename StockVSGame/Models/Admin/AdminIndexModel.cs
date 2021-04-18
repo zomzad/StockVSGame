@@ -103,6 +103,7 @@ namespace StockVSGame
                 data.SelectSingleNode("ActivityUrl").InnerText = ActivityUrl;
                 data.SelectSingleNode("Percent").InnerText = Percent.ToString();
                 data.SelectSingleNode("IsRadom").InnerText = IsRadom;
+                data.SelectSingleNode("StockNum").InnerText = StockInfoList.Where(n => n.IsChoose == "Y").ToList().Count.ToString();
                 data.SelectSingleNode("StockInfo").RemoveAll();
 
                 foreach (var row in StockInfoList.Where(n => string.IsNullOrWhiteSpace(n.StockID) == false))

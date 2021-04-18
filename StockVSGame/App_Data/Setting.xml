@@ -49,12 +49,13 @@
                 
                 
                 
+                
                 </MkTContent>
   <OnOff>O</OnOff>
   <!--開:O 關:F-->
   <ActivityUrl>
   </ActivityUrl>
-  <StockNum>1</StockNum>
+  <StockNum>15</StockNum>
   <StockInfo>
     <STK 股票代號="2406" 起始日期="2012-02-16" 選擇="Y" />
     <STK 股票代號="3481" 起始日期="2009-09-28" 選擇="Y" />

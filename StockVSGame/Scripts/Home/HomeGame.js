@@ -737,6 +737,10 @@ function redraw(data, RSIData, VolumeData) {
             }
         }
 
+        highestPrice = 0;
+        lowestPrice = 9999;
+        viewhighestPrice = 0;
+        viewlowestPrice = 9999;
         $('table tr', 'div#Play').hide();
         $('div#Result').show();
         $('div#Result #Man').html(man + '%');

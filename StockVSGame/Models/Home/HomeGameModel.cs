@@ -46,6 +46,8 @@ namespace StockVSGame
 
         public string IsRadom { get; set; }
         public string StockTotalNum { get; set; }
+        public string SettingStockNum { get; set; }
+        public string AddBackGroundPath { get; set; }
         public List<StockInfo> StockInfoList { get; set; }
         public Tech TechData = new Tech();
         #endregion
@@ -63,23 +65,30 @@ namespace StockVSGame
         {
             try
             {
-                List<List<Stock>> stockList = _entity.GetStockList(StockInfoList);
-                if (stockList.Any())
+                if (HttpContext.Current.Request.Url.Host.Contains("localhost") == false && HttpContext.Current.Request.Url.Host.Contains("vmjsmarket") == false)
                 {
-                    StockTotalNum = stockList.Count.ToString();
-                    MaCount(new List<int> { 20, 60 }, stockList[0]);//計算月線&季線
-
-                    //轉換資料格式適合data.json使用
-                    TechData.Data.AddRange(stockList.Select(n => n.Select(e =>
+                    StockTotalNum = SettingStockNum;
+                }
+                else
+                {
+                    List<List<Stock>> stockList = _entity.GetStockList(StockInfoList);
+                    if (stockList.Any())
                     {
-                        var propertyInfos = e.GetType().GetProperties();
-                        return propertyInfos.Select(x => e.GetType().GetProperty(x.Name).GetValue(e, null).ToString())
-                            .ToList();
-                    }).ToList()).ToList());
+                        StockTotalNum = stockList.Count.ToString();
+                        MaCount(new List<int> { 20, 60 }, stockList[0]);//計算月線&季線
 
-                    TechJsonStr = new JavaScriptSerializer().Serialize(TechData);
-                    var rootPath = System.Web.HttpContext.Current.Server.MapPath("../");
-                    File.WriteAllText(rootPath + "Scripts\\data.json", TechJsonStr);
+                        //轉換資料格式適合data.json使用
+                        TechData.Data.AddRange(stockList.Select(n => n.Select(e =>
+                        {
+                            var propertyInfos = e.GetType().GetProperties();
+                            return propertyInfos.Select(x => e.GetType().GetProperty(x.Name).GetValue(e, null).ToString())
+                                .ToList();
+                        }).ToList()).ToList());
+
+                        TechJsonStr = new JavaScriptSerializer().Serialize(TechData);
+                        var rootPath = System.Web.HttpContext.Current.Server.MapPath("../");
+                        File.WriteAllText(rootPath + "Scripts\\data.json", TechJsonStr);
+                    }
                 }
 
                 return true;
@@ -153,13 +162,16 @@ namespace StockVSGame
 
         public void GetSetting()
         {
+            Init();
             StockInfoList = new List<StockInfo>();
             XmlDocument xmlDoc = new XmlDocument();
             xmlDoc.Load(HttpContext.Current.Server.MapPath("~/App_Data/Setting.xml"));
+
             var data = xmlDoc.SelectNodes("/Settings").Cast<XmlNode>().SingleOrDefault();
             Percent = int.Parse(data.SelectSingleNode("Percent").InnerText);
             OnOff = data.SelectSingleNode("OnOff").InnerText;
             IsRadom = data.SelectSingleNode("IsRadom").InnerText;
+            SettingStockNum = data.SelectSingleNode("StockNum").InnerText;
             StockInfoList.AddRange(xmlDoc.SelectNodes("/Settings/StockInfo/STK").Cast<XmlNode>()
                 .Where(x => ((XmlElement)x).GetAttribute("選擇") == "Y")
                 .Select(n =>
@@ -167,14 +179,30 @@ namespace StockVSGame
                     XmlElement datas = (XmlElement)n;
                     return new StockInfo
                     {
-                        IsChoose = datas.GetAttribute("選擇"),
-                        StockID = datas.GetAttribute("股票代號"),
-                        Date = datas.GetAttribute("起始日期")
-                        //IsChoose = "Y",
-                        //StockID = "3014",
-                        //Date = "2020-07-16"
+                        IsChoose = datas.GetAttribute("選擇"),//ex:Y,N
+                        StockID = datas.GetAttribute("股票代號"),//ex:3014
+                        Date = datas.GetAttribute("起始日期")//ex:2020-07-16
                     };
                 }).ToList());
+        }
+
+        public void Init()
+        {
+            var path = string.Empty;
+            if (HttpContext.Current.Request.Url.Host.Contains("localhost"))
+            {
+                path = string.Empty;
+            }
+            else if (HttpContext.Current.Request.Url.Host.Contains("vmjsmarket"))
+            {
+                path = string.Empty;
+            }
+            else if (HttpContext.Current.Request.Url.Host.Contains("34"))
+            {
+                path = string.Empty;
+            }
+
+            AddBackGroundPath = "../" + path + "Content/img/black-carbon.jpg";
         }
     }
 }
