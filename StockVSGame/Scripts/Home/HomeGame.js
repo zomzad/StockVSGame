@@ -147,6 +147,20 @@ $(document).ready(function () {
         .attr("pointer-events", "all")
         .append("g")
         .attr("transform", "translate(" + marginRSI.left + "," + marginRSI.top + ")");
+
+    if (isRadom === 'Y') {
+        if (voidDupArr.length === parseInt(stockTotalNum)) {
+            voidDupArr = [];
+        }
+        exeIndex = GetRandom(0, stockTotalNum - 1);
+    } else {
+        if (exeIndex >= stockTotalNum - 1) {
+            exeIndex = 0;
+        } else {
+            exeIndex++;
+        }
+    }
+
     loadJSON(window.location.protocol + '//' + window.location.host + serverPath + "/Scripts/data.json", "date");
 });
 
@@ -246,7 +260,7 @@ function EventBind(parameters) {
 function RobotDrawFlag(XCoordinate) {
     var rectGroup = svg.append("g").attr("id", "Robotflag")
         .selectAll("text").data(techKFullData).enter();
-    var flagTxt = techKCount === 218 ? '結算出場' : '移動鎖利'
+    var flagTxt = techKCount === 218 ? '結算出場' : '移動鎖利';
 
     //線條
     rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 180)
