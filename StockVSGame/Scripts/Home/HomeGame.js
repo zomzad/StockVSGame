@@ -294,7 +294,7 @@ function RobotDrawFlag(XCoordinate) {
             return flagTxt + ': ' + sPrice_Robot;
         })
         .style('fill', '#000')
-        .style('font-size', '1vh')
+        .style('font-size', '0.6vh')
         .attr("class",
             function (d) {
                 if (d.point !== undefined) {
@@ -383,7 +383,7 @@ function DrawFlag(parameters) {
             return bsLineStyle[bsCount].bs + ': ' + techKFullData[techKCount].close;
         })
         .style('fill', '#FFFFFF')
-        .style('font-size', '1vh')
+        .style('font-size', '0.6vh')
         .attr("class",
             function (d) {
                 if (d.point !== undefined) {
