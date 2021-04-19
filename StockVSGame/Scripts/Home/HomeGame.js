@@ -15,6 +15,7 @@ var RobotIsFirst = 'N';
 //----------統計量----------
 var gameIsStart = false;
 var exeIndex = 0;
+var exeRowIndex = 0;
 var highestPrice = 0;
 var lowestPrice = 9999;
 var viewhighestPrice = 0;
@@ -27,6 +28,7 @@ var rsiFullData = null;
 var volumeFullData = null;
 var bsLineXCoordinate = 0;
 var voidDupArr = [];
+var exeIndexArr = [];
 
 //----------K線圖----------
 var margin = { top: 20, right: 50, bottom: 30, left: 50 },
@@ -147,22 +149,22 @@ $(document).ready(function () {
         .attr("pointer-events", "all")
         .append("g")
         .attr("transform", "translate(" + marginRSI.left + "," + marginRSI.top + ")");
-
+    
     if (isRadom === 'Y') {
-        if (voidDupArr.length === parseInt(stockTotalNum)) {
-            voidDupArr = [];
-        }
-        exeIndex = GetRandom(0, stockTotalNum - 1);
-    } else {
-        if (exeIndex >= stockTotalNum - 1) {
-            exeIndex = 0;
-        } else {
-            exeIndex++;
-        }
+        var arr = Object.keys(Array.apply(null, { length: stockTotalNum })).map(function(item) {
+            return +item;
+        });
+        exeIndexArr = arr.sort(Shuffle);
+        exeIndex = exeIndexArr[exeRowIndex];
     }
 
     loadJSON(window.location.protocol + '//' + window.location.host + serverPath + "/Scripts/data.json", "date");
 });
+
+function Shuffle(a, b) {
+    var num = Math.random() > 0.5 ? -1 : 1;
+    return num;
+}
 
 function EventBind(parameters) {
     $('#StartBtn').click(function () {
@@ -739,10 +741,16 @@ function redraw(data, RSIData, VolumeData) {
         var resultMsg = '';
         
         if (isRadom === 'Y') {
-            if (voidDupArr.length === parseInt(stockTotalNum)) {
-                voidDupArr = [];
+            if (exeRowIndex < stockTotalNum) {
+                exeRowIndex++;
+            } else {
+                exeRowIndex = 0;
+                var arr = Object.keys(Array.apply(null, { length: stockTotalNum })).map(function (item) {
+                    return +item;
+                });
+                exeIndexArr = arr.sort(Shuffle);
             }
-            exeIndex = GetRandom(0, stockTotalNum - 1);
+            exeIndex = exeIndexArr[exeRowIndex];
         } else {
             if (exeIndex >= stockTotalNum - 1) {
                 exeIndex = 0;
