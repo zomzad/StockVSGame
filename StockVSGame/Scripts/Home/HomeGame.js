@@ -173,7 +173,6 @@ function EventBind(parameters) {
             switch (bsCount) {
                 case 0:
                     $('#BuyBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_buy0.svg');
-                    $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
                     break;
                 case 1:
                     $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
@@ -207,6 +206,7 @@ function EventBind(parameters) {
                 $('#StartBtn').click();
             }
             DrawFlag();
+            $('#SellBtn', $('div#Play')).attr('src', window.location.protocol + '//' + window.location.host + serverPath + '/Content/img/bt_sell0.svg');
         }
     });
 
@@ -260,7 +260,7 @@ function EventBind(parameters) {
 function RobotDrawFlag(XCoordinate) {
     var rectGroup = svg.append("g").attr("id", "Robotflag")
         .selectAll("text").data(techKFullData).enter();
-    var flagTxt = techKCount === 218 ? '結算出場' : '移動鎖利';
+    var flagTxt = techKCount === 219 ? '結算出場' : '移動鎖利';
 
     //線條
     rectGroup.append('line').attr('x1', XCoordinate).attr('y1', 0).attr('x2', XCoordinate).attr('y2', 180)
