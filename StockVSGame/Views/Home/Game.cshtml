@@ -48,6 +48,11 @@
             font-size: 4vw;
             line-height: 1.5;
         }
+
+        .ft2{
+		    font-size: 2.5vw;
+		    line-height: 1.5;
+		}
     </style>
 </head>
 <body>
@@ -67,19 +72,20 @@
         <tr class="" align="center">
             <td>
                 <div class="row col-10 no-gutters" align="left">
-                    <div class="col-8 text-white ft1">
+                    <div class="col-8 text-white ft2">
                         <div>本次交易損益 :</div>
                         <div id="Man" class="text-warning">***%</div>
                         <div>透過移動鎖利損益 :</div>
                         <div id="Robot" class="text-warning">***%</div>
+                        <div>評語:</div>
+                        <span id="Comments"></span>
                     </div>
                     <div class="col-4 align-self-end">
                         <img id="Winlose" src="~/Content/img/youwin.png" class="img-fluid">
                     </div>
-                    <div class="col-12 text-white ft1">
-                        <div>評語 :</div>
-                        <span id="Comments"></span>
-                    </div>
+                </div>
+                <br><br><!--這是分隔行-->
+                <div id="Statistic" class="row col-10 no-gutters" align="left">
                 </div>
                 <div class="col-12 my-0 py-0">
                     <div id="Chart"></div>
@@ -120,7 +126,7 @@
         </tr>
         <tr class="" align="center">
             <td background="~/Content/img/bg_03.png" alt="" style="background-repeat: no-repeat;background-size: cover;" class="py-0">
-                <div class="row col-10 no-gutters" align="left">
+                <div id="StatisticGame" class="row col-10 no-gutters" align="left">
                     <div class="col-4 text-white">
                         <div><span id="Stock"></span></div>
                         <div>區間最高:<span id="High">0</span></div>

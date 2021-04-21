@@ -767,6 +767,7 @@ function redraw(data, RSIData, VolumeData) {
         $('div#Result').show();
         $('div#Result #Man').html(man + '%');
         $('div#Result #Robot').html(robot + '%');
+        $('div#Statistic').html($('div#StatisticGame').html());
         $('div#Chart').html($('div#CandlestickChart').prop("outerHTML"));
         $('span#TrigPrice_Robot').html('');
         $('span#BPrice').html('');
