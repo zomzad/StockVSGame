@@ -9,7 +9,6 @@ namespace StockVSGame.Controllers
         {
             HomeGameModel model = new HomeGameModel();
             model.GetSetting();
-            model.GetStockData();
 
             return View(model);
         }

@@ -10,16 +10,6 @@ using static StockVSGame.Entity.Home.HomeGameEntity;
 
 namespace StockVSGame
 {
-    #region - Definition -
-
-    public class StockInfo
-    {
-        public string IsChoose { get; set; }
-        public string StockID { get; set; }
-        public string Date { get; set; }
-    }
-    #endregion
-
     public class HomeGameModel
     {
         public HomeGameModel()
@@ -28,6 +18,12 @@ namespace StockVSGame
         }
 
         #region - Definition -
+        public class StockInfo
+        {
+            public string IsChoose { get; set; }
+            public string StockID { get; set; }
+            public string Date { get; set; }
+        }
 
         public class Tech
         {
@@ -184,6 +180,8 @@ namespace StockVSGame
                         Date = datas.GetAttribute("起始日期")//ex:2020-07-16
                     };
                 }).ToList());
+
+            StockTotalNum = SettingStockNum;
         }
 
         public void Init()

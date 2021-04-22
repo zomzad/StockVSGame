@@ -155,6 +155,7 @@
     <Compile Include="Controllers\Home\HomeController.Game.cs" />
     <Compile Include="Controllers\Home\HomeController.Index.cs" />
     <Compile Include="Controllers\_BaseController.cs" />
+    <Compile Include="Entity\Admin\AdminIndexEntity.cs" />
     <Compile Include="Entity\Home\HomeIndexEntity.cs" />
     <Compile Include="Entity\Home\HomeGameEntity.cs" />
     <Compile Include="Entity\_BaseEntity.cs" />

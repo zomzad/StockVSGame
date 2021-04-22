@@ -4,13 +4,13 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
-using static StockVSGame.HomeGameModel;
+using static StockVSGame.AdminIndexModel;
 
-namespace StockVSGame.Entity.Home
+namespace StockVSGame.Entity.Admin
 {
-    public class HomeGameEntity : _BaseEntity
+    public class AdminIndexEntity : _BaseEntity
     {
-        public HomeGameEntity(string id) : base(id)
+        public AdminIndexEntity(string id) : base(id)
         {
 
         }
@@ -29,7 +29,7 @@ namespace StockVSGame.Entity.Home
             public string 漲跌比例 { get; set; }
             public string 成交量 { get; set; }
             public string 周均線 { get; set; }
-            public string 月均線{ get; set; }
+            public string 月均線 { get; set; }
             public string 季均線 { get; set; }
             public string K { get; set; }
             public string D { get; set; }
