@@ -33,6 +33,7 @@ namespace StockVSGame
         }
 
         #region - Property -
+        public string ErrMag { get; set; }
         public string TechJsonStr { get; set; }
         /// <summary>
         /// 移動鎖利機器人%數
@@ -142,6 +143,7 @@ namespace StockVSGame
             }
             catch (Exception e)
             {
+                ErrMag = e.Message;
             }
 
             return false;
@@ -174,12 +176,16 @@ namespace StockVSGame
                     TechJsonStr = new JavaScriptSerializer().Serialize(TechData);
                     var rootPath = HttpContext.Current.Server.MapPath("");
                     File.WriteAllText(rootPath + "\\Scripts\\data.json", TechJsonStr);
+                }else if (string.IsNullOrWhiteSpace(_entity.errMag_entity) == false)
+                {
+                    ErrMag = _entity.errMag_entity;
                 }
 
                 return true;
             }
             catch (Exception e)
             {
+                ErrMag = e.Message;
             }
 
             return false;

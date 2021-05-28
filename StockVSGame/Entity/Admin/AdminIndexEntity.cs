@@ -43,6 +43,8 @@ namespace StockVSGame.Entity.Admin
             public string ADX { get; set; }
         }
 
+        public string errMag_entity = string.Empty;
+
         public List<List<Stock>> GetStockList(List<StockInfo> stockIDList)
         {
             List<List<Stock>> stockInfoList = new List<List<Stock>>();
@@ -123,9 +125,8 @@ namespace StockVSGame.Entity.Admin
             }
             catch (Exception ex)
             {
-
+                errMag_entity = ex.Message;
             }
-
 
             return stockInfoList;
         }

@@ -27,6 +27,11 @@
     </script>
 </head>
 <body>
+    @if (string.IsNullOrWhiteSpace(Model.ErrMag) == false)
+    {
+        <div style="background-color: red; color: white">@Model.ErrMag</div>
+    }
+
     @using (Html.BeginForm("Index", "Admin"))
     {
         <table style="border: 1px">

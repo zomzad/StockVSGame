@@ -54,12 +54,12 @@ path.volume.equal {
     stroke-width: 0.5px;
 }
 .ma-1 path.line {
-    stroke: #ff7f0e;
+    stroke: #ffc107;  /*#ff7f0e;*/
     fill: none;
     stroke-width: 0.5px;
 }
 .ma-2 path.line {
-    stroke: #aec7e8;
+    stroke: #17a2b8; /*#aec7e8;*/
     fill: none;
     stroke-width: 0.5px;
 }
